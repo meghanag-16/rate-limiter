@@ -1,0 +1,94 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+          cache: pip
+          cache-dependency-path: pyproject.toml
+      - run: python -m pip install -e ".[dev]"
+      - run: ruff check src tests benchmarks
+      - run: mypy src tests benchmarks
+      - run: bandit -c pyproject.toml -r src
+      - run: bandit -r benchmarks
+      # Ignore low-severity test patterns; B301 is the self-generated pickle
+      # round-trip in test_storage.py, not deserialization of untrusted input.
+      - run: bandit -r tests --severity-level medium --skip B301
+
+  fast:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+          cache: pip
+          cache-dependency-path: pyproject.toml
+      - run: python -m pip install -e ".[dev]"
+      - run: |
+          python -m coverage run -m pytest -m "not docker and not e2e"
+          python -m coverage combine
+          python -m coverage report -m
+
+  redis-e2e:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+          cache: pip
+          cache-dependency-path: pyproject.toml
+      - run: docker info
+      - run: python -m pip install -e ".[dev]"
+      - run: |
+          python -m coverage run -m pytest -m "docker or e2e"
+          python -m coverage combine
+          python -m coverage report -m
+
+  package-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+          cache: pip
+          cache-dependency-path: pyproject.toml
+      - run: python -m pip install build
+      - run: python -m build --wheel
+      - run: |
+          python -m venv "$RUNNER_TEMP/rlimit-wheel"
+          "$RUNNER_TEMP/rlimit-wheel/bin/python" -m pip install dist/*.whl
+      - working-directory: ${{ runner.temp }}
+        run: |
+          "$RUNNER_TEMP/rlimit-wheel/bin/python" -c "from rlimit import FixedWindow, MetricsHook, RedisGcraTokenBucket"
+          output=$("$RUNNER_TEMP/rlimit-wheel/bin/rlimit" demo --algorithm fixed_window --param1 2 --param2 60 --requests 4)
+          printf '%s\n' "$output"
+          test "$(printf '%s\n' "$output" | grep -c ALLOWED)" -eq 2
+          test "$(printf '%s\n' "$output" | grep -c DENIED)" -eq 2
+      - working-directory: ${{ runner.temp }}
+        run: |
+          set +e
+          "$RUNNER_TEMP/rlimit-wheel/bin/rlimit" benchmark -- --help > benchmark-check.txt 2>&1
+          status=$?
+          set -e
+          cat benchmark-check.txt
+          test "$status" -eq 1
+          grep -q "Could not find the benchmarks/ directory" benchmark-check.txt

@@ -1,0 +1,80 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "rlimit"
+version = "0.1.0"
+description = "A rate limiting library with multiple algorithms, sync/async support, and distributed backends"
+readme = "README.md"
+requires-python = ">=3.14"
+authors = [
+    { name = "Meghana G" }
+]
+classifiers = [
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.14",
+    "Typing :: Typed",
+]
+
+dependencies = [
+    "structlog>=24.0.0",
+    "redis>=8.1.0",
+]
+
+[project.scripts]
+rlimit = "rlimit.cli:main"
+
+[project.optional-dependencies]
+dev = [
+    "coverage>=7.10",
+    "mypy>=1.11",
+    "pytest>=8.0",
+    "pytest-cov>=5.0",
+    "hypothesis>=6.100",
+    "pytest-asyncio>=0.24",
+    "testcontainers>=4.15.0",
+    "ruff>=0.16.9",
+    "bandit>=1.8",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/rlimit"]
+
+[tool.mypy]
+python_version = "3.14"
+strict = true
+warn_unreachable = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+show_error_codes = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+asyncio_mode = "strict"
+addopts = "--strict-markers"
+markers = [
+    "docker: requires a running Docker daemon and a Redis container",
+    "e2e: exercises the public package or CLI as an end-to-end flow",
+]
+
+[tool.coverage.run]
+branch = true
+source = ["rlimit"]
+patch = ["subprocess"]
+parallel = true
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = false
+
+[tool.bandit]
+exclude_dirs = ["tests", "benchmarks"]
+
+[tool.ruff]
+line-length = 88
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B"]

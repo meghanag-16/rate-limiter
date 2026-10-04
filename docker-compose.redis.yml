@@ -1,0 +1,32 @@
+# docker-compose.redis.yml
+#
+# NOT used by the automated test suite -- tests/redis_test_helpers.py
+# uses testcontainers-python, which starts and tears down its own
+# throwaway Redis container automatically per test session. This file
+# is for manual, persistent local development only: e.g. running
+# `python -m rlimit lua-demo --algorithm fixed_window --param1 5
+# --param2 10` (or the `rlimit lua-demo` console script) by hand
+# against a real Redis without writing a test, or poking at stored
+# keys directly with redis-cli while debugging.
+#
+# Usage (from the project root, Windows cmd or any shell with Docker
+# available):
+#     docker compose -f docker-compose.redis.yml up -d
+#     docker compose -f docker-compose.redis.yml down
+#
+# Pinned to redis:7-alpine (not `latest`) to match the version pinned
+# in tests/redis_test_helpers.py, so manual testing and the automated
+# suite are running against the same Redis version.
+
+services:
+  redis:
+    image: redis:7-alpine
+    container_name: rlimit-dev-redis
+    ports:
+      - "6379:6379"
+    command: ["redis-server", "--appendonly", "no"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 2s
+      timeout: 2s
+      retries: 10
