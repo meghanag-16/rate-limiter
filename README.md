@@ -106,7 +106,7 @@ pytest -m "docker or e2e"
 
 `tests/conftest.py` marks every test that uses a Redis fixture as `docker`. Those tests start a throwaway `redis:7-alpine` container through testcontainers and fail (rather than skip) if Docker is not available. The `e2e` tests in `tests/e2e/` drive the public API, the CLI (through subprocesses), in-memory versus Redis parity, and the simulation-to-CSV flow.
 
-GitHub Actions (`.github/workflows/ci.yml`) runs lint/type/security checks, the fast lane on Ubuntu and Windows, the Redis and end-to-end lane on Ubuntu, and a wheel-install smoke test. See CONTRIBUTING.md.
+GitHub Actions (`.github/workflows/ci.yml`) runs lint/type/security checks, the fast lane on Ubuntu and Windows, the Redis and end-to-end lane on Ubuntu, and a wheel-install smoke test. 
 
 ## Known limitations
 
@@ -136,6 +136,3 @@ These are deliberate scope decisions or documented tradeoffs, not hidden bugs.
 **Packaging**
 - Requires Python 3.14 or newer.
 - `benchmarks/` is not shipped in the wheel, so the benchmark and memory commands need a source checkout.
-
-**Not built**
-- A hybrid limiter that switches algorithm based on load, an adaptive token bucket with decaying burst allowance, and configurable overflow behavior (reject, queue-and-delay, degrade) were descoped. See the `simulation.py` module docstring.
