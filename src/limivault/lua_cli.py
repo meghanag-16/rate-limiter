@@ -50,7 +50,9 @@ configure_logging(level=logging.WARNING)
 
 import redis  # noqa: E402
 
-from limivault.algorithms.redis_lua_fixed_window import RedisLuaFixedWindow  # noqa: E402
+from limivault.algorithms.redis_lua_fixed_window import (  # noqa: E402
+    RedisLuaFixedWindow,
+)
 from limivault.algorithms.redis_lua_leaky_bucket import (  # noqa: E402
     RedisLuaLeakyBucketMeter,
     RedisLuaLeakyBucketQueue,
@@ -61,7 +63,9 @@ from limivault.algorithms.redis_lua_sliding_window_counter import (  # noqa: E40
 from limivault.algorithms.redis_lua_sliding_window_log import (  # noqa: E402
     RedisLuaSlidingWindowLog,
 )
-from limivault.algorithms.redis_lua_token_bucket import RedisGcraTokenBucket  # noqa: E402
+from limivault.algorithms.redis_lua_token_bucket import (  # noqa: E402
+    RedisGcraTokenBucket,
+)
 from limivault.base import RateLimiter  # noqa: E402
 
 _DEMO_ALGORITHMS: Dict[str, Callable[["redis.Redis", float, float], RateLimiter]] = {

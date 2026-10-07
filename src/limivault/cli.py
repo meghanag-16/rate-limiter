@@ -63,7 +63,9 @@ from limivault.algorithms.leaky_bucket import (  # noqa: E402
     LeakyBucketMeter,
     LeakyBucketQueue,
 )
-from limivault.algorithms.sliding_window_counter import SlidingWindowCounter  # noqa: E402
+from limivault.algorithms.sliding_window_counter import (  # noqa: E402
+    SlidingWindowCounter,
+)
 from limivault.algorithms.sliding_window_log import SlidingWindowLog  # noqa: E402
 from limivault.algorithms.token_bucket import TokenBucket  # noqa: E402
 from limivault.base import RateLimiter  # noqa: E402

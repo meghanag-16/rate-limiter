@@ -45,7 +45,9 @@ def hammer_lua_gcra_token_bucket(
 def hammer_lua_sliding_window_log(
     host: str, port: int, limit: int, period: float, key: str, attempts: int
 ) -> int:
-    from limivault.algorithms.redis_lua_sliding_window_log import RedisLuaSlidingWindowLog
+    from limivault.algorithms.redis_lua_sliding_window_log import (
+        RedisLuaSlidingWindowLog,
+    )
 
     client = redis.Redis(host=host, port=port)
     limiter = RedisLuaSlidingWindowLog(client, limit=limit, period=period)
