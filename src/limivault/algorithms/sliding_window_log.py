@@ -13,7 +13,7 @@ simulation/visualization-only addition: AllowedEvent/
 DeniedEvent now also carry `utilization` (here:
 `final_total / self._limit`, the post-decision total admitted cost in
 the trailing window relative to the configured limit -- comparable
-across algorithms, see limivault.metrics module docstring's 
+across algorithms, see limivault.metrics module docstring's
 section) and `timestamp` (the `now` value already read inside the
 lock). BackendErrorEvent's `timestamp` uses a fresh `self._clock()`
 call in the except-handler, per the reason documented in

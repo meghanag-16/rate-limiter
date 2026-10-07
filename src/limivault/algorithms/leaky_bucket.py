@@ -1,5 +1,5 @@
 # src/limivault/algorithms/leaky_bucket.py
-"""Leaky bucket rate limiters (Meter + Queue variants). 
+"""Leaky bucket rate limiters (Meter + Queue variants).
 
 additions: see fixed_window.py's module docstring for the full
 rationale (metrics hook, BackendUnavailableError handling, DEBUG
@@ -10,7 +10,7 @@ DeniedEvent now also carry `utilization` and `timestamp` -- for
 LeakyBucketMeter, `utilization = final_volume / self._capacity`; for
 LeakyBucketQueue, `utilization = final_depth / self._capacity`. Both
 are "how full is the bucket right now" relative to capacity, comparable
-across algorithms -- see limivault.metrics module docstring's 
+across algorithms -- see limivault.metrics module docstring's
 section. `timestamp` is the `now` value already read inside the lock;
 BackendErrorEvent's `timestamp` uses a fresh `self._clock()` call in
 the except-handler for the reason documented in fixed_window.py.
