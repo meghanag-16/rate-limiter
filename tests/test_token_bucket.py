@@ -1,5 +1,5 @@
 # tests/test_token_bucket.py
-"""Unit tests for rlimit.algorithms.token_bucket.TokenBucket.
+"""Unit tests for limivault.algorithms.token_bucket.TokenBucket.
 
 Added the concurrency coverage this file was previously missing
 (same situation as test_fixed_window.py -- no threading, multiprocessing,
@@ -20,9 +20,9 @@ import pytest
 from hypothesis import given, settings
 from hypothesis import strategies as st
 
-from rlimit.algorithms.token_bucket import TokenBucket
-from rlimit.base import UnsatisfiableRequestError
-from rlimit.storage import InMemoryStorage
+from limivault.algorithms.token_bucket import TokenBucket
+from limivault.base import UnsatisfiableRequestError
+from limivault.storage import InMemoryStorage
 from tests.mp_workers import hammer_token_bucket
 
 

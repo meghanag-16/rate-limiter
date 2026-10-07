@@ -3,7 +3,7 @@
 FakeClock defined locally -- see test_async_fixed_window.py for why.
 
 Fixed from the first pass: import path corrected to
-`rlimit.algorithms.async_leaky_bucket`. Boundary-race and property
+`limivault.algorithms.async_leaky_bucket`. Boundary-race and property
 tests now run against YieldingAsyncStorage (tests/async_test_helpers.py)
 instead of plain AsyncInMemoryStorage, so they force real event-loop
 interleaving between coroutines instead of passing by construction --
@@ -18,11 +18,11 @@ import pytest
 from hypothesis import given, settings
 from hypothesis import strategies as st
 
-from rlimit.algorithms.async_leaky_bucket import (
+from limivault.algorithms.async_leaky_bucket import (
     AsyncLeakyBucketMeter,
     AsyncLeakyBucketQueue,
 )
-from rlimit.base import UnsatisfiableRequestError
+from limivault.base import UnsatisfiableRequestError
 from tests.async_test_helpers import YieldingAsyncStorage
 
 

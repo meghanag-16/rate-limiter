@@ -12,7 +12,7 @@ import asyncio
 
 import pytest
 
-from rlimit.storage import AsyncInMemoryStorage
+from limivault.storage import AsyncInMemoryStorage
 
 
 @pytest.mark.asyncio

@@ -54,7 +54,7 @@ import tracemalloc
 from typing import Any, Callable, List, Tuple
 
 # Importing bench_common triggers its own configure_logging(level=
-# WARNING) call BEFORE it imports any rlimit.algorithms.* module -- see
+# WARNING) call BEFORE it imports any limivault.algorithms.* module -- see
 # that file's comment for why the ordering matters (structlog's bind()
 # resolves logging config at bind-time, not at each log call). Without
 # that ordering, per-call DEBUG decision logging would flood
@@ -123,7 +123,7 @@ def _print_table(rows: List[Tuple[str, int, int, float]]) -> None:
 def main() -> None:
     parser = argparse.ArgumentParser(
         description="Measure steady-state memory growth per unique key, "
-        "for all 12 rlimit algorithm classes."
+        "for all 12 limivault algorithm classes."
     )
     parser.add_argument(
         "--n-keys",

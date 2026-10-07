@@ -60,9 +60,9 @@ import time
 from dataclasses import asdict
 from typing import Any, Callable, Dict, List, Optional, Tuple
 
-from rlimit.logging import configure_logging
+from limivault.logging import configure_logging
 
-# MUST run before any rlimit.algorithms.* import -- see
+# MUST run before any limivault.algorithms.* import -- see
 # benchmarks/bench_common.py's identical comment for the full
 # rationale (structlog binds its module-level logger at import time,
 # not at first log call, so configuring afterward is too late).
@@ -73,20 +73,20 @@ from benchmarks.concurrency_harness import (  # noqa: E402
     run_matrix_cell,
     run_warmup,
 )
-from rlimit.algorithms.async_fixed_window import AsyncFixedWindow  # noqa: E402
-from rlimit.algorithms.async_leaky_bucket import (  # noqa: E402
+from limivault.algorithms.async_fixed_window import AsyncFixedWindow  # noqa: E402
+from limivault.algorithms.async_leaky_bucket import (  # noqa: E402
     AsyncLeakyBucketMeter,
     AsyncLeakyBucketQueue,
 )
-from rlimit.algorithms.async_sliding_window_counter import (  # noqa: E402
+from limivault.algorithms.async_sliding_window_counter import (  # noqa: E402
     AsyncSlidingWindowCounter,
 )
-from rlimit.algorithms.async_sliding_window_log import (  # noqa: E402
+from limivault.algorithms.async_sliding_window_log import (  # noqa: E402
     AsyncSlidingWindowLog,
 )
-from rlimit.algorithms.async_token_bucket import AsyncTokenBucket  # noqa: E402
-from rlimit.base import AsyncRateLimiter  # noqa: E402
-from rlimit.storage import AsyncInMemoryStorage, AsyncStorageBackend  # noqa: E402
+from limivault.algorithms.async_token_bucket import AsyncTokenBucket  # noqa: E402
+from limivault.base import AsyncRateLimiter  # noqa: E402
+from limivault.storage import AsyncInMemoryStorage, AsyncStorageBackend  # noqa: E402
 
 _DEFAULT_CONCURRENCY = [1, 10, 100, 500, 1000]
 _DEFAULT_NUM_KEYS = [1, 100, 10000]
@@ -403,7 +403,7 @@ def _print_aggregate_table(
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        description="Full-matrix async concurrency benchmark for rlimit."
+        description="Full-matrix async concurrency benchmark for limivault."
     )
     parser.add_argument(
         "--algorithms",

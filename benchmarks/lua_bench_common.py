@@ -55,28 +55,28 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, Callable, List, Tuple
 
-from rlimit.algorithms.async_redis_lua_fixed_window import AsyncRedisLuaFixedWindow
-from rlimit.algorithms.async_redis_lua_leaky_bucket import (
+from limivault.algorithms.async_redis_lua_fixed_window import AsyncRedisLuaFixedWindow
+from limivault.algorithms.async_redis_lua_leaky_bucket import (
     AsyncRedisLuaLeakyBucketMeter,
     AsyncRedisLuaLeakyBucketQueue,
 )
-from rlimit.algorithms.async_redis_lua_sliding_window_counter import (
+from limivault.algorithms.async_redis_lua_sliding_window_counter import (
     AsyncRedisLuaSlidingWindowCounter,
 )
-from rlimit.algorithms.async_redis_lua_sliding_window_log import (
+from limivault.algorithms.async_redis_lua_sliding_window_log import (
     AsyncRedisLuaSlidingWindowLog,
 )
-from rlimit.algorithms.async_redis_lua_token_bucket import AsyncRedisGcraTokenBucket
-from rlimit.algorithms.redis_lua_fixed_window import RedisLuaFixedWindow
-from rlimit.algorithms.redis_lua_leaky_bucket import (
+from limivault.algorithms.async_redis_lua_token_bucket import AsyncRedisGcraTokenBucket
+from limivault.algorithms.redis_lua_fixed_window import RedisLuaFixedWindow
+from limivault.algorithms.redis_lua_leaky_bucket import (
     RedisLuaLeakyBucketMeter,
     RedisLuaLeakyBucketQueue,
 )
-from rlimit.algorithms.redis_lua_sliding_window_counter import (
+from limivault.algorithms.redis_lua_sliding_window_counter import (
     RedisLuaSlidingWindowCounter,
 )
-from rlimit.algorithms.redis_lua_sliding_window_log import RedisLuaSlidingWindowLog
-from rlimit.algorithms.redis_lua_token_bucket import RedisGcraTokenBucket
+from limivault.algorithms.redis_lua_sliding_window_log import RedisLuaSlidingWindowLog
+from limivault.algorithms.redis_lua_token_bucket import RedisGcraTokenBucket
 
 if TYPE_CHECKING:
     import redis

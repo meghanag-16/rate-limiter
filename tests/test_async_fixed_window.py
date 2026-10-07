@@ -7,8 +7,8 @@ summary: importing a shared FakeClock from conftest caused
 sys.path collection errors on Windows).
 
 Fixed from the first pass: import path was
-`rlimit.async_fixed_window`, which does not exist -- the implementation
-lives in `rlimit.algorithms.async_fixed_window`, matching the sync
+`limivault.async_fixed_window`, which does not exist -- the implementation
+lives in `limivault.algorithms.async_fixed_window`, matching the sync
 package layout. Also: the original boundary-race and property tests
 ran against plain AsyncInMemoryStorage, whose get()/set() contain no
 real `await`, so asyncio.gather() rarely gave two coroutines a genuine
@@ -26,9 +26,9 @@ import pytest
 from hypothesis import given, settings
 from hypothesis import strategies as st
 
-from rlimit.algorithms.async_fixed_window import AsyncFixedWindow
-from rlimit.base import UnsatisfiableRequestError
-from rlimit.storage import AsyncInMemoryStorage
+from limivault.algorithms.async_fixed_window import AsyncFixedWindow
+from limivault.base import UnsatisfiableRequestError
+from limivault.storage import AsyncInMemoryStorage
 from tests.async_test_helpers import YieldingAsyncStorage
 
 

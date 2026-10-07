@@ -27,19 +27,19 @@ import uuid
 import pytest
 import redis.asyncio as redis_async
 
-from rlimit.algorithms.async_redis_lua_fixed_window import AsyncRedisLuaFixedWindow
-from rlimit.algorithms.async_redis_lua_leaky_bucket import (
+from limivault.algorithms.async_redis_lua_fixed_window import AsyncRedisLuaFixedWindow
+from limivault.algorithms.async_redis_lua_leaky_bucket import (
     AsyncRedisLuaLeakyBucketMeter,
     AsyncRedisLuaLeakyBucketQueue,
 )
-from rlimit.algorithms.async_redis_lua_sliding_window_counter import (
+from limivault.algorithms.async_redis_lua_sliding_window_counter import (
     AsyncRedisLuaSlidingWindowCounter,
 )
-from rlimit.algorithms.async_redis_lua_sliding_window_log import (
+from limivault.algorithms.async_redis_lua_sliding_window_log import (
     AsyncRedisLuaSlidingWindowLog,
 )
-from rlimit.algorithms.async_redis_lua_token_bucket import AsyncRedisGcraTokenBucket
-from rlimit.base import AsyncRateLimiter
+from limivault.algorithms.async_redis_lua_token_bucket import AsyncRedisGcraTokenBucket
+from limivault.base import AsyncRateLimiter
 from tests.redis_test_helpers import (
     async_redis_client,
     redis_connection_params,

@@ -81,7 +81,7 @@ DESIGN DECISIONS
    sorted list (see `_percentile` below) rather than pulling in NumPy
    as a dependency for one function -- this project has consistently
    avoided adding a dependency for something a few lines of stdlib
-   arithmetic covers (see rlimit.metrics's module docstring, point 3,
+   arithmetic covers (see limivault.metrics's module docstring, point 3,
    declining to import prometheus_client for the same reason).
 --------------------------------------------------------------------
 """
@@ -95,7 +95,7 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING, List, Tuple
 
 if TYPE_CHECKING:
-    from rlimit.base import AsyncRateLimiter
+    from limivault.base import AsyncRateLimiter
 
 __all__ = [
     "MatrixCellResult",

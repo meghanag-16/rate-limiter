@@ -10,16 +10,16 @@ from __future__ import annotations
 
 import pytest
 
-from rlimit.algorithms.async_fixed_window import AsyncFixedWindow
-from rlimit.algorithms.async_leaky_bucket import (
+from limivault.algorithms.async_fixed_window import AsyncFixedWindow
+from limivault.algorithms.async_leaky_bucket import (
     AsyncLeakyBucketMeter,
     AsyncLeakyBucketQueue,
 )
-from rlimit.algorithms.async_sliding_window_counter import AsyncSlidingWindowCounter
-from rlimit.algorithms.async_sliding_window_log import AsyncSlidingWindowLog
-from rlimit.algorithms.async_token_bucket import AsyncTokenBucket
-from rlimit.base import AsyncRateLimiter
-from rlimit.storage import AsyncInMemoryStorage
+from limivault.algorithms.async_sliding_window_counter import AsyncSlidingWindowCounter
+from limivault.algorithms.async_sliding_window_log import AsyncSlidingWindowLog
+from limivault.algorithms.async_token_bucket import AsyncTokenBucket
+from limivault.base import AsyncRateLimiter
+from limivault.storage import AsyncInMemoryStorage
 
 
 class FakeClock:

@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.1.0 - 2026-10-07
 
 ### Added
 - End-to-end checks for the public API, CLI, backend parity, and simulation-to-CSV flows.

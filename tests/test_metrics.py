@@ -1,5 +1,5 @@
 # tests/test_metrics.py
-"""Tests for rlimit.metrics and its wiring into FixedWindow (chosen as
+"""Tests for limivault.metrics and its wiring into FixedWindow (chosen as
 the representative algorithm -- the same emit_allowed/emit_denied/
 emit_backend_error pattern is identical across all ten algorithm
 files, per each file's module docstring, so this is not re-verified
@@ -8,16 +8,16 @@ checks two more to confirm the pattern was actually applied, not just
 described).
 
 Deliberately tests the SCOPE BOUNDARIES documented in
-rlimit.metrics's module docstring (points 7, 8, 9), not just the
+limivault.metrics's module docstring (points 7, 8, 9), not just the
 happy path -- these are the parts most likely to silently regress.
 """
 
 from __future__ import annotations
 
-from rlimit.algorithms.fixed_window import FixedWindow
-from rlimit.algorithms.leaky_bucket import LeakyBucketMeter
-from rlimit.algorithms.token_bucket import TokenBucket
-from rlimit.metrics import (
+from limivault.algorithms.fixed_window import FixedWindow
+from limivault.algorithms.leaky_bucket import LeakyBucketMeter
+from limivault.algorithms.token_bucket import TokenBucket
+from limivault.metrics import (
     AllowedEvent,
     BackendErrorEvent,
     DeniedEvent,
@@ -60,7 +60,7 @@ class RecordingHook:
 
 class RaisingHook:
     """A hook whose every method raises -- used to prove hook failures
-    are isolated (rlimit.metrics module docstring, point 7)."""
+    are isolated (limivault.metrics module docstring, point 7)."""
 
     def on_allowed(self, event: AllowedEvent) -> None:
         raise RuntimeError("boom-allowed")

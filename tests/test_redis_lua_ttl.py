@@ -16,7 +16,7 @@ per the review's explicit list:
 
 REQUIRES DOCKER -- see redis_test_helpers.py's module docstring. Uses
 real `time.sleep()` throughout -- no FakeClock is available for this
-backend (see rlimit.redis_lua_scripts's module docstring), so a TTL
+backend (see limivault.redis_lua_scripts's module docstring), so a TTL
 is let genuinely expire by sleeping a real, short interval.
 """
 
@@ -28,10 +28,10 @@ import uuid
 import pytest
 import redis as redis_sync
 
-from rlimit.algorithms.redis_lua_fixed_window import RedisLuaFixedWindow
-from rlimit.algorithms.redis_lua_leaky_bucket import RedisLuaLeakyBucketMeter
-from rlimit.algorithms.redis_lua_token_bucket import RedisGcraTokenBucket
-from rlimit.redis_lua_scripts import FALLBACK_TTL_SECONDS, TTL_BUFFER_SECONDS
+from limivault.algorithms.redis_lua_fixed_window import RedisLuaFixedWindow
+from limivault.algorithms.redis_lua_leaky_bucket import RedisLuaLeakyBucketMeter
+from limivault.algorithms.redis_lua_token_bucket import RedisGcraTokenBucket
+from limivault.redis_lua_scripts import FALLBACK_TTL_SECONDS, TTL_BUFFER_SECONDS
 from tests.redis_test_helpers import redis_client, redis_container
 
 __all__ = ["redis_container", "redis_client"]

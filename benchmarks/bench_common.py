@@ -1,5 +1,5 @@
 # benchmarks/bench_common.py
-"""Shared factory table for all 12 concrete rlimit algorithm classes
+"""Shared factory table for all 12 concrete limivault algorithm classes
 (6 sync + 6 async), reused by the earlier per-call benchmark prototype
 (pytest-benchmark timing) and memory_footprint.py (tracemalloc-based
 memory measurement).
@@ -28,9 +28,9 @@ import logging
 import time
 from typing import Any, Callable, List, Tuple
 
-from rlimit.logging import configure_logging
+from limivault.logging import configure_logging
 
-# MUST run before any `rlimit.algorithms.*` import below. Each
+# MUST run before any `limivault.algorithms.*` import below. Each
 # algorithm module calls `get_logger(__name__).bind(...)` at its own
 # import time (see e.g. fixed_window.py's `_log = get_logger(__name__)`
 # at module level), and structlog's bind() resolves/caches the active
@@ -38,32 +38,32 @@ from rlimit.logging import configure_logging
 # verified directly: a logger bound before configure_logging() runs
 # keeps emitting DEBUG lines even after a later configure_logging()
 # call, because that later call only affects loggers bound after it.
-# So this must be the first rlimit import in this file, ahead of the
+# So this must be the first limivault import in this file, ahead of the
 # algorithm imports below, or DEBUG decision
 # logging would flood stdout during throughput/memory benchmark runs.
 configure_logging(level=logging.WARNING)
 
-from rlimit.algorithms.async_fixed_window import AsyncFixedWindow  # noqa: E402
-from rlimit.algorithms.async_leaky_bucket import (  # noqa: E402
+from limivault.algorithms.async_fixed_window import AsyncFixedWindow  # noqa: E402
+from limivault.algorithms.async_leaky_bucket import (  # noqa: E402
     AsyncLeakyBucketMeter,
     AsyncLeakyBucketQueue,
 )
-from rlimit.algorithms.async_sliding_window_counter import (  # noqa: E402
+from limivault.algorithms.async_sliding_window_counter import (  # noqa: E402
     AsyncSlidingWindowCounter,
 )
-from rlimit.algorithms.async_sliding_window_log import (  # noqa: E402
+from limivault.algorithms.async_sliding_window_log import (  # noqa: E402
     AsyncSlidingWindowLog,
 )
-from rlimit.algorithms.async_token_bucket import AsyncTokenBucket  # noqa: E402
-from rlimit.algorithms.fixed_window import FixedWindow  # noqa: E402
-from rlimit.algorithms.leaky_bucket import (  # noqa: E402
+from limivault.algorithms.async_token_bucket import AsyncTokenBucket  # noqa: E402
+from limivault.algorithms.fixed_window import FixedWindow  # noqa: E402
+from limivault.algorithms.leaky_bucket import (  # noqa: E402
     LeakyBucketMeter,
     LeakyBucketQueue,
 )
-from rlimit.algorithms.sliding_window_counter import SlidingWindowCounter  # noqa: E402
-from rlimit.algorithms.sliding_window_log import SlidingWindowLog  # noqa: E402
-from rlimit.algorithms.token_bucket import TokenBucket  # noqa: E402
-from rlimit.storage import AsyncInMemoryStorage, InMemoryStorage  # noqa: E402
+from limivault.algorithms.sliding_window_counter import SlidingWindowCounter  # noqa: E402
+from limivault.algorithms.sliding_window_log import SlidingWindowLog  # noqa: E402
+from limivault.algorithms.token_bucket import TokenBucket  # noqa: E402
+from limivault.storage import AsyncInMemoryStorage, InMemoryStorage  # noqa: E402
 
 _HUGE = 10**9
 

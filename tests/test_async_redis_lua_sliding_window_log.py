@@ -11,10 +11,10 @@ import uuid
 import pytest
 import redis.asyncio as redis_async
 
-from rlimit.algorithms.async_redis_lua_sliding_window_log import (
+from limivault.algorithms.async_redis_lua_sliding_window_log import (
     AsyncRedisLuaSlidingWindowLog,
 )
-from rlimit.base import UnsatisfiableRequestError
+from limivault.base import UnsatisfiableRequestError
 from tests.redis_test_helpers import (
     async_redis_client,
     redis_connection_params,

@@ -2,7 +2,7 @@
 """Ergonomics tests (block_until_allowed, wait(), rate_limit(),
 KeyedLimiter) against Redis-backed Lua rate limiters.
 
-Verifies that rlimit.ergonomics works with Redis Lua/GCRA algorithms that
+Verifies that limivault.ergonomics works with Redis Lua/GCRA algorithms that
 have no injected clock parameter -- the ergonomics layer's own timeout
 clock (default time.monotonic) is fully independent of the limiter's
 internal time source (Redis TIME).
@@ -18,10 +18,10 @@ import uuid
 import pytest
 import redis as redis_sync
 
-from rlimit.algorithms.redis_lua_fixed_window import RedisLuaFixedWindow
-from rlimit.algorithms.redis_lua_token_bucket import RedisGcraTokenBucket
-from rlimit.base import UnsatisfiableRequestError
-from rlimit.ergonomics import (
+from limivault.algorithms.redis_lua_fixed_window import RedisLuaFixedWindow
+from limivault.algorithms.redis_lua_token_bucket import RedisGcraTokenBucket
+from limivault.base import UnsatisfiableRequestError
+from limivault.ergonomics import (
     KeyedLimiter,
     RateLimitTimeoutError,
     block_until_allowed,

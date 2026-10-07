@@ -1,5 +1,5 @@
 # tests/test_storage.py
-"""Unit tests for rlimit.storage.InMemoryStorage.
+"""Unit tests for limivault.storage.InMemoryStorage.
 
 Added multiprocess_safe=True to InMemoryStorage (see the module
 docstring in storage.py for the full design rationale: a fixed pool of
@@ -19,7 +19,7 @@ import threading
 import time
 from concurrent.futures import ProcessPoolExecutor
 
-from rlimit.storage import InMemoryStorage
+from limivault.storage import InMemoryStorage
 from tests.mp_workers import hammer_fixed_window
 
 

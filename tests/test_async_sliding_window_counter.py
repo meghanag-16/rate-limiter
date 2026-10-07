@@ -27,9 +27,9 @@ import pytest
 from hypothesis import given, settings
 from hypothesis import strategies as st
 
-from rlimit.algorithms.async_sliding_window_counter import AsyncSlidingWindowCounter
-from rlimit.base import UnsatisfiableRequestError
-from rlimit.storage import AsyncInMemoryStorage
+from limivault.algorithms.async_sliding_window_counter import AsyncSlidingWindowCounter
+from limivault.base import UnsatisfiableRequestError
+from limivault.storage import AsyncInMemoryStorage
 from tests.async_test_helpers import YieldingAsyncStorage
 
 

@@ -9,7 +9,7 @@ client holds live socket connections that don't survive a
 pickle/unpickle round trip the way a picklable Manager proxy does).
 
 v2 note: none of these limiters take a `clock=` argument (see
-rlimit.redis_lua_scripts's module docstring), so no worker below
+limivault.redis_lua_scripts's module docstring), so no worker below
 passes one.
 """
 
@@ -21,7 +21,7 @@ import redis
 def hammer_lua_fixed_window(
     host: str, port: int, limit: int, period: float, key: str, attempts: int
 ) -> int:
-    from rlimit.algorithms.redis_lua_fixed_window import RedisLuaFixedWindow
+    from limivault.algorithms.redis_lua_fixed_window import RedisLuaFixedWindow
 
     client = redis.Redis(host=host, port=port)
     limiter = RedisLuaFixedWindow(client, limit=limit, period=period)
@@ -33,7 +33,7 @@ def hammer_lua_fixed_window(
 def hammer_lua_gcra_token_bucket(
     host: str, port: int, capacity: int, refill_rate: float, key: str, attempts: int
 ) -> int:
-    from rlimit.algorithms.redis_lua_token_bucket import RedisGcraTokenBucket
+    from limivault.algorithms.redis_lua_token_bucket import RedisGcraTokenBucket
 
     client = redis.Redis(host=host, port=port)
     limiter = RedisGcraTokenBucket(client, capacity=capacity, refill_rate=refill_rate)
@@ -45,7 +45,7 @@ def hammer_lua_gcra_token_bucket(
 def hammer_lua_sliding_window_log(
     host: str, port: int, limit: int, period: float, key: str, attempts: int
 ) -> int:
-    from rlimit.algorithms.redis_lua_sliding_window_log import RedisLuaSlidingWindowLog
+    from limivault.algorithms.redis_lua_sliding_window_log import RedisLuaSlidingWindowLog
 
     client = redis.Redis(host=host, port=port)
     limiter = RedisLuaSlidingWindowLog(client, limit=limit, period=period)
@@ -57,7 +57,7 @@ def hammer_lua_sliding_window_log(
 def hammer_lua_sliding_window_counter(
     host: str, port: int, limit: int, period: float, key: str, attempts: int
 ) -> int:
-    from rlimit.algorithms.redis_lua_sliding_window_counter import (
+    from limivault.algorithms.redis_lua_sliding_window_counter import (
         RedisLuaSlidingWindowCounter,
     )
 
@@ -71,7 +71,7 @@ def hammer_lua_sliding_window_counter(
 def hammer_lua_leaky_bucket_meter(
     host: str, port: int, capacity: int, leak_rate: float, key: str, attempts: int
 ) -> int:
-    from rlimit.algorithms.redis_lua_leaky_bucket import RedisLuaLeakyBucketMeter
+    from limivault.algorithms.redis_lua_leaky_bucket import RedisLuaLeakyBucketMeter
 
     client = redis.Redis(host=host, port=port)
     limiter = RedisLuaLeakyBucketMeter(client, capacity=capacity, leak_rate=leak_rate)
@@ -83,7 +83,7 @@ def hammer_lua_leaky_bucket_meter(
 def hammer_lua_leaky_bucket_queue(
     host: str, port: int, capacity: int, leak_rate: float, key: str, attempts: int
 ) -> int:
-    from rlimit.algorithms.redis_lua_leaky_bucket import RedisLuaLeakyBucketQueue
+    from limivault.algorithms.redis_lua_leaky_bucket import RedisLuaLeakyBucketQueue
 
     client = redis.Redis(host=host, port=port)
     limiter = RedisLuaLeakyBucketQueue(client, capacity=capacity, leak_rate=leak_rate)

@@ -1,6 +1,6 @@
 """CLI unit checks run in child processes to isolate logging setup.
 
-Importing ``rlimit.cli`` configures structlog for the command-line app.
+Importing ``limivault.cli`` configures structlog for the command-line app.
 Keep that import out of pytest's process: cached loggers would otherwise
 interfere with ``structlog.testing.capture_logs`` in other test modules.
 """
@@ -37,7 +37,7 @@ def _run_isolated(code: str) -> subprocess.CompletedProcess[str]:
 
 def test_direct_library_use_is_quiet_by_default() -> None:
     result = _run_isolated(
-        "from rlimit import FixedWindow; "
+        "from limivault import FixedWindow; "
         "limiter = FixedWindow(limit=1, period=60); "
         "limiter.allow('quiet-check'); limiter.allow('quiet-check')"
     )
@@ -49,7 +49,7 @@ def test_direct_library_use_is_quiet_by_default() -> None:
 
 def test_demo_dispatch_runs_without_parent_process_import() -> None:
     code = """
-from rlimit.cli import main
+from limivault.cli import main
 raise SystemExit(main([
     "demo", "--algorithm", "fixed_window", "--param1", "2",
     "--param2", "60", "--requests", "4",
@@ -63,10 +63,10 @@ raise SystemExit(main([
 
 
 @pytest.mark.parametrize("command", ["benchmark", "memory", "lua-benchmark"])
-def test_benchmark_wrappers_report_missing_directory(command: str) -> None:
+def test_benchmark_commands_are_not_registered_without_directory(command: str) -> None:
     code = f"""
 from pathlib import Path
-from rlimit import cli, lua_cli
+from limivault import cli, lua_cli
 missing = Path.cwd() / "no-such-benchmarks-directory"
 cli._find_repo_root = lambda: missing
 lua_cli._find_repo_root = lambda: missing
@@ -74,15 +74,15 @@ raise SystemExit(cli.main([{command!r}]))
 """
     result = _run_isolated(code)
 
-    assert result.returncode == 1
-    assert "Could not find the benchmarks/ directory" in result.stderr
+    assert result.returncode == 2
+    assert f"invalid choice: {command!r}" in result.stderr
 
 
 def test_benchmark_wrapper_forwards_arguments() -> None:
     code = """
 from pathlib import Path
 from types import SimpleNamespace
-from rlimit import cli
+from limivault import cli
 root = Path.cwd()
 calls = []
 cli._find_repo_root = lambda: root
@@ -101,7 +101,7 @@ def test_memory_wrapper_forwards_key_counts() -> None:
     code = """
 from pathlib import Path
 from types import SimpleNamespace
-from rlimit import cli
+from limivault import cli
 root = Path.cwd()
 calls = []
 cli._find_repo_root = lambda: root
@@ -118,7 +118,7 @@ assert calls[0][-3:] == ["--n-keys", "10", "20"]
 def test_lua_cli_reports_connection_failure_without_network() -> None:
     code = """
 from types import SimpleNamespace
-import rlimit.lua_cli as lua_cli
+import limivault.lua_cli as lua_cli
 class BrokenRedis:
     def ping(self):
         raise ConnectionError("offline")
@@ -139,7 +139,7 @@ def test_lua_benchmark_wrapper_forwards_arguments() -> None:
     code = """
 from pathlib import Path
 from types import SimpleNamespace
-from rlimit import cli, lua_cli
+from limivault import cli, lua_cli
 root = Path.cwd()
 calls = []
 lua_cli._find_repo_root = lambda: root

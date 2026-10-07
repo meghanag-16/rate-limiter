@@ -29,20 +29,20 @@ from typing import Any
 
 import pytest
 
-from rlimit.algorithms.async_fixed_window import AsyncFixedWindow
-from rlimit.algorithms.async_leaky_bucket import (
+from limivault.algorithms.async_fixed_window import AsyncFixedWindow
+from limivault.algorithms.async_leaky_bucket import (
     AsyncLeakyBucketMeter,
     AsyncLeakyBucketQueue,
 )
-from rlimit.algorithms.async_sliding_window_counter import AsyncSlidingWindowCounter
-from rlimit.algorithms.async_sliding_window_log import AsyncSlidingWindowLog
-from rlimit.algorithms.async_token_bucket import AsyncTokenBucket
-from rlimit.algorithms.fixed_window import FixedWindow
-from rlimit.algorithms.leaky_bucket import LeakyBucketMeter, LeakyBucketQueue
-from rlimit.algorithms.sliding_window_counter import SlidingWindowCounter
-from rlimit.algorithms.sliding_window_log import SlidingWindowLog
-from rlimit.algorithms.token_bucket import TokenBucket
-from rlimit.metrics import AllowedEvent, BackendErrorEvent, DeniedEvent
+from limivault.algorithms.async_sliding_window_counter import AsyncSlidingWindowCounter
+from limivault.algorithms.async_sliding_window_log import AsyncSlidingWindowLog
+from limivault.algorithms.async_token_bucket import AsyncTokenBucket
+from limivault.algorithms.fixed_window import FixedWindow
+from limivault.algorithms.leaky_bucket import LeakyBucketMeter, LeakyBucketQueue
+from limivault.algorithms.sliding_window_counter import SlidingWindowCounter
+from limivault.algorithms.sliding_window_log import SlidingWindowLog
+from limivault.algorithms.token_bucket import TokenBucket
+from limivault.metrics import AllowedEvent, BackendErrorEvent, DeniedEvent
 
 
 class FakeClock:

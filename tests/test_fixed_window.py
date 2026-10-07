@@ -1,5 +1,5 @@
 # tests/test_fixed_window.py
-"""Unit tests for rlimit.algorithms.fixed_window.FixedWindow.
+"""Unit tests for limivault.algorithms.fixed_window.FixedWindow.
 
 Concurrency coverage to this file which was previously missing is added
 (it had zero threading, multiprocessing, or Hypothesis tests before this
@@ -33,9 +33,9 @@ import pytest
 from hypothesis import given, settings
 from hypothesis import strategies as st
 
-from rlimit.algorithms.fixed_window import FixedWindow
-from rlimit.base import UnsatisfiableRequestError
-from rlimit.storage import InMemoryStorage
+from limivault.algorithms.fixed_window import FixedWindow
+from limivault.base import UnsatisfiableRequestError
+from limivault.storage import InMemoryStorage
 from tests.mp_workers import hammer_fixed_window
 
 

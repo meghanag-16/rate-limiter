@@ -1,5 +1,5 @@
 # tests/test_ergonomics.py
-"""Tests for rlimit.ergonomics (sync).
+"""Tests for limivault.ergonomics (sync).
 
 FakeClock defined locally.
 
@@ -19,9 +19,9 @@ from concurrent.futures import ThreadPoolExecutor
 
 import pytest
 
-from rlimit.algorithms.fixed_window import FixedWindow
-from rlimit.base import UnsatisfiableRequestError
-from rlimit.ergonomics import (
+from limivault.algorithms.fixed_window import FixedWindow
+from limivault.base import UnsatisfiableRequestError
+from limivault.ergonomics import (
     KeyedLimiter,
     RateLimitTimeoutError,
     block_until_allowed,

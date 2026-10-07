@@ -1,6 +1,6 @@
 # tests/test_simulation.py
-"""Tests for rlimit.simulation (simulation/visualization-only)
- and the two new rlimit.metrics event fields (`utilization`,
+"""Tests for limivault.simulation (simulation/visualization-only)
+ and the two new limivault.metrics event fields (`utilization`,
 `timestamp`) that simulation mode depends on.
 
 the file has the following components :
@@ -13,10 +13,10 @@ the file has the following components :
   - async_run_simulation() works end-to-end against an async algorithm.
   - `utilization` values are correct for a couple of known scenarios
     (not just "present"), matching the per-algorithm formulas
-    documented in rlimit.metrics's docstring section.
+    documented in limivault.metrics's docstring section.
   - A backend_error row is recorded with no `utilization` value.
 
-FakeClock/SimulationClock note: this file uses rlimit.simulation's own
+FakeClock/SimulationClock note: this file uses limivault.simulation's own
 SimulationClock directly (rather than a locally-defined FakeClock, as
 every other test file in this project does) since SimulationClock IS
 the thing being tested here, not an unrelated test utility -- using it
@@ -30,11 +30,11 @@ import json
 
 import pytest
 
-from rlimit.algorithms.async_fixed_window import AsyncFixedWindow
-from rlimit.algorithms.fixed_window import FixedWindow
-from rlimit.algorithms.token_bucket import TokenBucket
-from rlimit.exceptions import BackendUnavailableError
-from rlimit.simulation import (
+from limivault.algorithms.async_fixed_window import AsyncFixedWindow
+from limivault.algorithms.fixed_window import FixedWindow
+from limivault.algorithms.token_bucket import TokenBucket
+from limivault.exceptions import BackendUnavailableError
+from limivault.simulation import (
     SimulationClock,
     SimulationRecorder,
     TrafficStep,
@@ -44,7 +44,7 @@ from rlimit.simulation import (
     random_traffic,
     run_simulation,
 )
-from rlimit.storage import StorageBackend
+from limivault.storage import StorageBackend
 
 # ---------------------------------------------------------------------------
 # SimulationClock

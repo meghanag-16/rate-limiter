@@ -18,7 +18,7 @@ see base.py's module docstring):
 
 REQUIRES DOCKER -- see redis_test_helpers.py's module docstring. Every
 limiter below is constructed with NO `clock=` argument (see
-rlimit.redis_lua_scripts's module docstring -- these classes use
+limivault.redis_lua_scripts's module docstring -- these classes use
 Redis's own server clock, not client-side injection), and each gets
 its own randomized key so tests never collide within the shared
 Redis database `redis_client` provides.
@@ -31,17 +31,17 @@ import uuid
 import pytest
 import redis as redis_sync
 
-from rlimit.algorithms.redis_lua_fixed_window import RedisLuaFixedWindow
-from rlimit.algorithms.redis_lua_leaky_bucket import (
+from limivault.algorithms.redis_lua_fixed_window import RedisLuaFixedWindow
+from limivault.algorithms.redis_lua_leaky_bucket import (
     RedisLuaLeakyBucketMeter,
     RedisLuaLeakyBucketQueue,
 )
-from rlimit.algorithms.redis_lua_sliding_window_counter import (
+from limivault.algorithms.redis_lua_sliding_window_counter import (
     RedisLuaSlidingWindowCounter,
 )
-from rlimit.algorithms.redis_lua_sliding_window_log import RedisLuaSlidingWindowLog
-from rlimit.algorithms.redis_lua_token_bucket import RedisGcraTokenBucket
-from rlimit.base import RateLimiter, UnsatisfiableRequestError
+from limivault.algorithms.redis_lua_sliding_window_log import RedisLuaSlidingWindowLog
+from limivault.algorithms.redis_lua_token_bucket import RedisGcraTokenBucket
+from limivault.base import RateLimiter, UnsatisfiableRequestError
 from tests.redis_test_helpers import redis_client, redis_container
 
 __all__ = ["redis_container", "redis_client"]

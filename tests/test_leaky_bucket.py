@@ -1,4 +1,4 @@
-"""Unit tests for rlimit.algorithms.leaky_bucket (LeakyBucketMeter and
+"""Unit tests for limivault.algorithms.leaky_bucket (LeakyBucketMeter and
 LeakyBucketQueue).
 
 Constructor validation: capacity > 0 and leak_rate >= 0 are now enforced
@@ -42,9 +42,9 @@ import pytest
 from hypothesis import given, settings
 from hypothesis import strategies as st
 
-from rlimit.algorithms.leaky_bucket import LeakyBucketMeter, LeakyBucketQueue
-from rlimit.base import UnsatisfiableRequestError
-from rlimit.storage import InMemoryStorage
+from limivault.algorithms.leaky_bucket import LeakyBucketMeter, LeakyBucketQueue
+from limivault.base import UnsatisfiableRequestError
+from limivault.storage import InMemoryStorage
 from tests.mp_workers import hammer_leaky_bucket_meter, hammer_leaky_bucket_queue
 
 

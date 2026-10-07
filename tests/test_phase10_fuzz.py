@@ -55,12 +55,12 @@ from typing import Any, Callable, List, Tuple
 
 import pytest
 
-from rlimit.algorithms.fixed_window import FixedWindow
-from rlimit.algorithms.leaky_bucket import LeakyBucketMeter, LeakyBucketQueue
-from rlimit.algorithms.sliding_window_counter import SlidingWindowCounter
-from rlimit.algorithms.sliding_window_log import SlidingWindowLog
-from rlimit.algorithms.token_bucket import TokenBucket
-from rlimit.base import RateLimiter, UnsatisfiableRequestError
+from limivault.algorithms.fixed_window import FixedWindow
+from limivault.algorithms.leaky_bucket import LeakyBucketMeter, LeakyBucketQueue
+from limivault.algorithms.sliding_window_counter import SlidingWindowCounter
+from limivault.algorithms.sliding_window_log import SlidingWindowLog
+from limivault.algorithms.token_bucket import TokenBucket
+from limivault.base import RateLimiter, UnsatisfiableRequestError
 
 
 class FakeClock:

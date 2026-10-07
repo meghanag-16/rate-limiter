@@ -11,7 +11,7 @@ needed.
 
 Scope boundary: allow_wait() raises
 BackendUnavailableError on a backend failure but does NOT additionally
-emit a backend_error metrics event (rlimit.metrics module docstring,
+emit a backend_error metrics event (limivault.metrics module docstring,
 point 9).
 
 FakeClock and RecordingHook are defined locally rather than in a
@@ -26,10 +26,10 @@ from typing import Any
 
 import pytest
 
-from rlimit.algorithms.fixed_window import FixedWindow
-from rlimit.exceptions import BackendUnavailableError
-from rlimit.metrics import AllowedEvent, BackendErrorEvent, DeniedEvent
-from rlimit.storage import StorageBackend
+from limivault.algorithms.fixed_window import FixedWindow
+from limivault.exceptions import BackendUnavailableError
+from limivault.metrics import AllowedEvent, BackendErrorEvent, DeniedEvent
+from limivault.storage import StorageBackend
 
 
 class FakeClock:
@@ -103,7 +103,7 @@ class TestFixedWindowBackendErrorWiring:
 
     def test_a_raising_hook_does_not_mask_the_backend_error(self) -> None:
         """The metrics hook itself failing must not change or swallow
-        the original BackendUnavailableError -- see rlimit.metrics
+        the original BackendUnavailableError -- see limivault.metrics
         module docstring point 7."""
 
         class RaisingHook:
@@ -134,7 +134,7 @@ class TestFixedWindowBackendErrorWiring:
     def test_allow_wait_raises_backend_unavailable_without_a_metrics_event(
         self,
     ) -> None:
-        """Deliberate scope boundary (rlimit.metrics module
+        """Deliberate scope boundary (limivault.metrics module
         docstring point 9): allow_wait() still raises
         BackendUnavailableError on a backend failure, but does NOT
         additionally emit a backend_error metrics event ."""

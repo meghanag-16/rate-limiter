@@ -2,7 +2,7 @@
 """RedisLuaLeakyBucketMeter / RedisLuaLeakyBucketQueue against real
 Redis. One file for both variants, matching this project's existing
 leaky_bucket.py/test_leaky_bucket.py convention. Real elapsed time
-(no FakeClock -- see rlimit.redis_lua_scripts's module docstring).
+(no FakeClock -- see limivault.redis_lua_scripts's module docstring).
 
 REQUIRES DOCKER -- see redis_test_helpers.py's module docstring.
 """
@@ -15,11 +15,11 @@ import uuid
 import pytest
 import redis as redis_sync
 
-from rlimit.algorithms.redis_lua_leaky_bucket import (
+from limivault.algorithms.redis_lua_leaky_bucket import (
     RedisLuaLeakyBucketMeter,
     RedisLuaLeakyBucketQueue,
 )
-from rlimit.base import UnsatisfiableRequestError
+from limivault.base import UnsatisfiableRequestError
 from tests.redis_test_helpers import redis_client, redis_container
 
 __all__ = ["redis_container", "redis_client"]
