@@ -1,7 +1,7 @@
 # tests/test_redis_lua_script_contract.py
 """Level 2 tests (review #20): verify the raw return shape of each of
 the six Lua scripts directly via EVAL, independent of the Python
-wrapper classes in rlimit.algorithms.redis_lua_*.py.
+wrapper classes in limivault.algorithms.redis_lua_*.py.
 
 WHY THIS FILE EXISTS, SEPARATELY FROM THE PER-ALGORITHM TEST FILES:
 every wrapper class unpacks the script's return value positionally --
@@ -28,7 +28,7 @@ import uuid
 
 import redis as redis_sync
 
-from rlimit.redis_lua_scripts import (
+from limivault.redis_lua_scripts import (
     FIXED_WINDOW,
     GCRA_TOKEN_BUCKET,
     LEAKY_BUCKET_METER,

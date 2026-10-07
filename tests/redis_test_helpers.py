@@ -87,7 +87,7 @@ def redis_connection_params(
     ITS OWN flush (e.g. a neighboring test using `redis_client`,
     which does flush). That's exactly what broke: the meter test
     wrote `{"volume": ..., "last_leak": ...}` under the same
-    `rlimit:data:shared-key` the queue test then read as
+    `limivault:data:shared-key` the queue test then read as
     `{"depth": ..., "last_drain": ...}`, raising `KeyError: 'depth'`
     inside a worker process. Flushing directly in this fixture, not
     relying on neighboring tests' side effects, is the actual fix --

@@ -1,5 +1,5 @@
 # tests/test_redis_lua_simulation.py
-"""Tests for rlimit.rlimit_lua_simulation — the real-time simulation
+"""Tests for limivault.redis_lua_simulation — the real-time simulation
 driver for Redis-native Lua limiters.
 
 Verifies that:
@@ -21,10 +21,10 @@ import pytest
 import redis as redis_sync
 import redis.asyncio as redis_async
 
-from rlimit.algorithms.async_redis_lua_token_bucket import AsyncRedisGcraTokenBucket
-from rlimit.algorithms.redis_lua_fixed_window import RedisLuaFixedWindow
-from rlimit.algorithms.redis_lua_token_bucket import RedisGcraTokenBucket
-from rlimit.rlimit_lua_simulation import (
+from limivault.algorithms.async_redis_lua_token_bucket import AsyncRedisGcraTokenBucket
+from limivault.algorithms.redis_lua_fixed_window import RedisLuaFixedWindow
+from limivault.algorithms.redis_lua_token_bucket import RedisGcraTokenBucket
+from limivault.redis_lua_simulation import (
     LuaSimulationRecorder,
     TrafficStep,
     async_run_lua_simulation,

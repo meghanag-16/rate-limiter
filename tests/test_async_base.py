@@ -1,5 +1,5 @@
 # tests/test_async_base.py
-"""Tests for rlimit.base.AsyncRateLimiter.
+"""Tests for limivault.base.AsyncRateLimiter.
 
 Mirrors test_base.py's four tests for the sync RateLimiter ABC exactly,
 just with async method implementations and await where needed.
@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import pytest
 
-from rlimit.base import AsyncRateLimiter
+from limivault.base import AsyncRateLimiter
 
 
 def test_async_rate_limiter_is_abstract() -> None:

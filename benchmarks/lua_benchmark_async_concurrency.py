@@ -75,12 +75,12 @@ import uuid
 from dataclasses import asdict
 from typing import Any, Callable, Dict, List, Optional, Tuple
 
-from rlimit.logging import configure_logging
+from limivault.logging import configure_logging
 
 # Same ordering requirement as the original benchmark scripts (see
 # bench_common.py's identical comment) -- structlog binds its
 # module-level logger at import time, so this must run before any
-# rlimit.algorithms.* import below.
+# limivault.algorithms.* import below.
 configure_logging(level=logging.WARNING)
 
 from benchmarks.concurrency_harness import (  # noqa: E402
@@ -89,7 +89,7 @@ from benchmarks.concurrency_harness import (  # noqa: E402
     run_warmup,
 )
 from benchmarks.lua_bench_common import ASYNC_FACTORIES  # noqa: E402
-from rlimit.base import AsyncRateLimiter  # noqa: E402
+from limivault.base import AsyncRateLimiter  # noqa: E402
 
 _DEFAULT_CONCURRENCY = [1, 10, 100, 500, 1000]
 _DEFAULT_NUM_KEYS = [1, 100, 10000]
@@ -346,7 +346,7 @@ def _print_aggregate_table(
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        description="Async concurrency benchmark for rlimit's Redis Lua/GCRA "
+        description="Async concurrency benchmark for limivault's Redis Lua/GCRA "
         "(Lua/GCRA) Redis-native limiters."
     )
     parser.add_argument(

@@ -2,7 +2,7 @@
 """RedisLuaFixedWindow against real Redis. Mirrors
 test_fixed_window.py's structure/spirit for the in-memory
 FixedWindow, adapted for this family's shared-Redis-server-clock
-design (see rlimit.redis_lua_scripts's module docstring): there is no
+design (see limivault.redis_lua_scripts's module docstring): there is no
 FakeClock to
 inject here, so window-boundary tests use real, short periods and real
 `time.sleep()` instead of `clock.advance()`.
@@ -18,8 +18,8 @@ import uuid
 import pytest
 import redis as redis_sync
 
-from rlimit.algorithms.redis_lua_fixed_window import RedisLuaFixedWindow
-from rlimit.base import UnsatisfiableRequestError
+from limivault.algorithms.redis_lua_fixed_window import RedisLuaFixedWindow
+from limivault.base import UnsatisfiableRequestError
 from tests.redis_test_helpers import redis_client, redis_container
 
 __all__ = ["redis_container", "redis_client"]

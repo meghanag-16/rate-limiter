@@ -1,7 +1,7 @@
 # tests/test_redis_lua_sliding_window_counter.py
 """RedisLuaSlidingWindowCounter against real Redis. Covers basic
 weighted-decay behavior across a real window rollover (real sleep, no
-FakeClock -- see rlimit.redis_lua_scripts's module docstring) and
+FakeClock -- see limivault.redis_lua_scripts's module docstring) and
 allow_wait().
 
 REQUIRES DOCKER -- see redis_test_helpers.py's module docstring.
@@ -15,10 +15,10 @@ import uuid
 import pytest
 import redis as redis_sync
 
-from rlimit.algorithms.redis_lua_sliding_window_counter import (
+from limivault.algorithms.redis_lua_sliding_window_counter import (
     RedisLuaSlidingWindowCounter,
 )
-from rlimit.base import UnsatisfiableRequestError
+from limivault.base import UnsatisfiableRequestError
 from tests.redis_test_helpers import redis_client, redis_container
 
 __all__ = ["redis_container", "redis_client"]

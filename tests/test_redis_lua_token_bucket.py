@@ -1,7 +1,7 @@
 # tests/test_redis_lua_token_bucket.py
 """RedisGcraTokenBucket against real Redis. Covers basic burst/refill
 behavior, the GCRA-specific refill_rate==0 fallback path (see
-rlimit.redis_lua_scripts's module docstring, GCRA gap note), and
+limivault.redis_lua_scripts's module docstring, GCRA gap note), and
 allow_wait().
 
 REQUIRES DOCKER -- see redis_test_helpers.py's module docstring.
@@ -15,8 +15,8 @@ import uuid
 import pytest
 import redis as redis_sync
 
-from rlimit.algorithms.redis_lua_token_bucket import RedisGcraTokenBucket
-from rlimit.base import UnsatisfiableRequestError
+from limivault.algorithms.redis_lua_token_bucket import RedisGcraTokenBucket
+from limivault.base import UnsatisfiableRequestError
 from tests.redis_test_helpers import redis_client, redis_container
 
 __all__ = ["redis_container", "redis_client"]

@@ -11,8 +11,8 @@ import uuid
 import pytest
 import redis.asyncio as redis_async
 
-from rlimit.algorithms.async_redis_lua_token_bucket import AsyncRedisGcraTokenBucket
-from rlimit.base import UnsatisfiableRequestError
+from limivault.algorithms.async_redis_lua_token_bucket import AsyncRedisGcraTokenBucket
+from limivault.base import UnsatisfiableRequestError
 from tests.redis_test_helpers import (
     async_redis_client,
     redis_connection_params,

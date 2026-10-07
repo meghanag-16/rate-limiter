@@ -14,7 +14,7 @@ ProcessPoolExecutor lives here, at module level.
 
 Each worker builds its OWN limiter instance inside the child process,
 wrapping the SAME `InMemoryStorage(multiprocess_safe=True)` object passed
-in from the parent (see rlimit.storage module docstring for how that
+in from the parent (see limivault.storage module docstring for how that
 storage instance survives being pickled across the process boundary).
 `leak_rate=0` / `refill_rate=0` are used for the two algorithms that decay
 over time, matching the existing single-process ThreadPoolExecutor stress
@@ -28,13 +28,13 @@ from __future__ import annotations
 
 import time
 
-from rlimit.storage import StorageBackend
+from limivault.storage import StorageBackend
 
 
 def hammer_fixed_window(
     storage: StorageBackend, limit: int, period: float, key: str, attempts: int
 ) -> int:
-    from rlimit.algorithms.fixed_window import FixedWindow
+    from limivault.algorithms.fixed_window import FixedWindow
 
     limiter = FixedWindow(
         limit=limit, period=period, storage=storage, clock=time.monotonic
@@ -49,7 +49,7 @@ def hammer_token_bucket(
     key: str,
     attempts: int,
 ) -> int:
-    from rlimit.algorithms.token_bucket import TokenBucket
+    from limivault.algorithms.token_bucket import TokenBucket
 
     limiter = TokenBucket(
         capacity=capacity,
@@ -63,7 +63,7 @@ def hammer_token_bucket(
 def hammer_sliding_window_log(
     storage: StorageBackend, limit: int, period: float, key: str, attempts: int
 ) -> int:
-    from rlimit.algorithms.sliding_window_log import SlidingWindowLog
+    from limivault.algorithms.sliding_window_log import SlidingWindowLog
 
     limiter = SlidingWindowLog(
         limit=limit, period=period, storage=storage, clock=time.monotonic
@@ -74,7 +74,7 @@ def hammer_sliding_window_log(
 def hammer_sliding_window_counter(
     storage: StorageBackend, limit: int, period: float, key: str, attempts: int
 ) -> int:
-    from rlimit.algorithms.sliding_window_counter import SlidingWindowCounter
+    from limivault.algorithms.sliding_window_counter import SlidingWindowCounter
 
     limiter = SlidingWindowCounter(
         limit=limit, period=period, storage=storage, clock=time.monotonic
@@ -89,7 +89,7 @@ def hammer_leaky_bucket_meter(
     key: str,
     attempts: int,
 ) -> int:
-    from rlimit.algorithms.leaky_bucket import LeakyBucketMeter
+    from limivault.algorithms.leaky_bucket import LeakyBucketMeter
 
     limiter = LeakyBucketMeter(
         capacity=capacity,
@@ -107,7 +107,7 @@ def hammer_leaky_bucket_queue(
     key: str,
     attempts: int,
 ) -> int:
-    from rlimit.algorithms.leaky_bucket import LeakyBucketQueue
+    from limivault.algorithms.leaky_bucket import LeakyBucketQueue
 
     limiter = LeakyBucketQueue(
         capacity=capacity,

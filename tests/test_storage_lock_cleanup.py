@@ -26,7 +26,7 @@ from typing import cast
 
 import pytest
 
-from rlimit.storage import (
+from limivault.storage import (
     _DEFAULT_LOCK_IDLE_SECONDS,
     _DEFAULT_LOCK_SWEEP_INTERVAL,
     AsyncInMemoryStorage,

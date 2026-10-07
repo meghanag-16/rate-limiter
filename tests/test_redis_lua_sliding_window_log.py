@@ -2,14 +2,14 @@
 """RedisLuaSlidingWindowLog against real Redis (ZSET-backed). Covers
 basic correctness, the exact-cutoff expiry semantics (an entry with
 timestamp == now - period is expired -- see
-rlimit.redis_lua_scripts.SLIDING_WINDOW_LOG's own comment: the script
+limivault.redis_lua_scripts.SLIDING_WINDOW_LOG's own comment: the script
 uses ZREMRANGEBYSCORE(key, '-inf', cutoff), an inclusive upper bound,
 so a score exactly at cutoff IS removed, matching this project's
 existing SlidingWindowLog semantics where `ts > cutoff` is the
 survival condition), and allow_wait().
 
 REQUIRES DOCKER -- see redis_test_helpers.py's module docstring. No
-FakeClock available for this backend (see rlimit.redis_lua_scripts's
+FakeClock available for this backend (see limivault.redis_lua_scripts's
 module docstring) -- boundary timing uses real sleeps with a small
 buffer (a deliberate epsilon past the exact boundary), the real-time
 counterpart of the `clock.advance(...)` boundary tests in
@@ -25,8 +25,8 @@ from typing import cast
 import pytest
 import redis as redis_sync
 
-from rlimit.algorithms.redis_lua_sliding_window_log import RedisLuaSlidingWindowLog
-from rlimit.base import UnsatisfiableRequestError
+from limivault.algorithms.redis_lua_sliding_window_log import RedisLuaSlidingWindowLog
+from limivault.base import UnsatisfiableRequestError
 from tests.redis_test_helpers import redis_client, redis_container
 
 __all__ = ["redis_container", "redis_client"]
@@ -66,7 +66,7 @@ def test_stored_entries_are_zset_members_with_cost_prefix(
     redis_client: redis_sync.Redis,
 ) -> None:
     """Direct regression check for this backend's member-encoding
-    scheme (see rlimit.redis_lua_scripts.SLIDING_WINDOW_LOG's own
+    scheme (see limivault.redis_lua_scripts.SLIDING_WINDOW_LOG's own
     comment) -- confirms cost travels as a parseable prefix on the
     member string (a ZSET member is a plain string, so cost is encoded
     into it rather than stored as a separate field)."""

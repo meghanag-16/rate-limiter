@@ -37,16 +37,16 @@ import hypothesis.strategies as st
 import redis as redis_sync
 from hypothesis import HealthCheck, given, settings
 
-from rlimit.algorithms.redis_lua_fixed_window import RedisLuaFixedWindow
-from rlimit.algorithms.redis_lua_leaky_bucket import (
+from limivault.algorithms.redis_lua_fixed_window import RedisLuaFixedWindow
+from limivault.algorithms.redis_lua_leaky_bucket import (
     RedisLuaLeakyBucketMeter,
     RedisLuaLeakyBucketQueue,
 )
-from rlimit.algorithms.redis_lua_sliding_window_counter import (
+from limivault.algorithms.redis_lua_sliding_window_counter import (
     RedisLuaSlidingWindowCounter,
 )
-from rlimit.algorithms.redis_lua_sliding_window_log import RedisLuaSlidingWindowLog
-from rlimit.algorithms.redis_lua_token_bucket import RedisGcraTokenBucket
+from limivault.algorithms.redis_lua_sliding_window_log import RedisLuaSlidingWindowLog
+from limivault.algorithms.redis_lua_token_bucket import RedisGcraTokenBucket
 from tests.redis_test_helpers import redis_client, redis_container
 
 __all__ = ["redis_container", "redis_client"]
@@ -731,7 +731,7 @@ class TestMetricsFuzz:
 
     ) -> None:
 
-        from rlimit.metrics import AllowedEvent, DeniedEvent
+        from limivault.metrics import AllowedEvent, DeniedEvent
 
 
 

@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import pytest
 
-from rlimit.base import RateLimiter
+from limivault.base import RateLimiter
 
 
 def test_rate_limiter_is_abstract() -> None:

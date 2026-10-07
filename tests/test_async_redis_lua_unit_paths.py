@@ -13,19 +13,19 @@ from typing import Any
 import pytest
 import redis.exceptions
 
-from rlimit.algorithms.async_redis_lua_fixed_window import (
+from limivault.algorithms.async_redis_lua_fixed_window import (
     AsyncRedisLuaFixedWindow,
 )
-from rlimit.algorithms.async_redis_lua_leaky_bucket import (
+from limivault.algorithms.async_redis_lua_leaky_bucket import (
     AsyncRedisLuaLeakyBucketMeter,
     AsyncRedisLuaLeakyBucketQueue,
 )
-from rlimit.algorithms.async_redis_lua_sliding_window_log import (
+from limivault.algorithms.async_redis_lua_sliding_window_log import (
     AsyncRedisLuaSlidingWindowLog,
 )
-from rlimit.algorithms.async_redis_lua_token_bucket import AsyncRedisGcraTokenBucket
-from rlimit.base import UnsatisfiableRequestError
-from rlimit.exceptions import BackendUnavailableError
+from limivault.algorithms.async_redis_lua_token_bucket import AsyncRedisGcraTokenBucket
+from limivault.base import UnsatisfiableRequestError
+from limivault.exceptions import BackendUnavailableError
 
 
 class FakeRedis:

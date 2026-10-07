@@ -10,8 +10,8 @@ import pytest
 import redis
 from testcontainers.community.redis import RedisContainer
 
-import rlimit
-from rlimit import (
+import limivault
+from limivault import (
     FixedWindow,
     LuaSimulationRecorder,
     RedisLuaFixedWindow,
@@ -74,7 +74,7 @@ def test_cli_demo_has_exact_decision_counts() -> None:
         [
             sys.executable,
             "-m",
-            "rlimit",
+            "limivault",
             "demo",
             "--algorithm",
             "fixed_window",
@@ -106,7 +106,7 @@ def test_cli_demo_has_exact_decision_counts() -> None:
 )
 def test_benchmark_cli_help(command: str) -> None:
     result = subprocess.run(
-        [sys.executable, "-m", "rlimit", command, "--", "--help"],
+        [sys.executable, "-m", "limivault", command, "--", "--help"],
         cwd=_PROJECT_ROOT,
         env=_env_from_checkout(),
         capture_output=True,
@@ -142,7 +142,7 @@ def test_lua_cli_demo_against_test_redis(
         [
             sys.executable,
             "-m",
-            "rlimit",
+            "limivault",
             "lua-demo",
             "--algorithm",
             "fixed_window",
@@ -173,7 +173,7 @@ def test_lua_cli_reports_unreachable_redis() -> None:
     code = "\n".join(
         [
             "from types import SimpleNamespace",
-            "import rlimit.lua_cli as lua_cli",
+            "import limivault.lua_cli as lua_cli",
             "class BrokenRedis:",
             "    def ping(self):",
             "        raise ConnectionError('offline')",
@@ -201,8 +201,8 @@ def test_lua_cli_reports_unreachable_redis() -> None:
 
 
 def test_root_exports_are_resolvable_from_black_box() -> None:
-    assert rlimit.FixedWindow is FixedWindow
-    assert rlimit.RedisLuaFixedWindow is RedisLuaFixedWindow
+    assert limivault.FixedWindow is FixedWindow
+    assert limivault.RedisLuaFixedWindow is RedisLuaFixedWindow
 
 
 @pytest.mark.docker

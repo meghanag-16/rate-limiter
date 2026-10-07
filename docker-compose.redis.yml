@@ -4,8 +4,8 @@
 # uses testcontainers-python, which starts and tears down its own
 # throwaway Redis container automatically per test session. This file
 # is for manual, persistent local development only: e.g. running
-# `python -m rlimit lua-demo --algorithm fixed_window --param1 5
-# --param2 10` (or the `rlimit lua-demo` console script) by hand
+# `python -m limivault lua-demo --algorithm fixed_window --param1 5
+# --param2 10` (or the `limivault lua-demo` console script) by hand
 # against a real Redis without writing a test, or poking at stored
 # keys directly with redis-cli while debugging.
 #
@@ -21,7 +21,7 @@
 services:
   redis:
     image: redis:7-alpine
-    container_name: rlimit-dev-redis
+    container_name: limivault-dev-redis
     ports:
       - "6379:6379"
     command: ["redis-server", "--appendonly", "no"]

@@ -1,7 +1,7 @@
 # tests/test_public_api.py
-"""The package-root and rlimit.algorithms public API.
+"""The package-root and limivault.algorithms public API.
 
-`from rlimit import FixedWindow` / `from rlimit.algorithms import
+`from limivault import FixedWindow` / `from limivault.algorithms import
 RedisGcraTokenBucket` work through lazy (PEP 562) exports, so these
 tests check three things:
 
@@ -9,17 +9,17 @@ tests check three things:
     agree on the object for every algorithm class;
   - unknown names still raise AttributeError (the lazy `__getattr__`
     does not swallow typos);
-  - importing `rlimit` does NOT import any algorithm module. Each
+  - importing `limivault` does NOT import any algorithm module. Each
     algorithm module binds its structlog logger at import time, so an
     eager import here would break the "configure_logging() first"
     ordering used by the CLI and the benchmarks. The last test runs
-    `rlimit demo` in a subprocess and asserts no per-call DEBUG
+    `limivault demo` in a subprocess and asserts no per-call DEBUG
     decision lines leak into its output.
 
 The tests always exercise THIS checkout's src/ tree: pyproject.toml
 puts src/ on pytest's import path, and the subprocess-based tests below
 set PYTHONPATH to it explicitly. Without that, a stale non-editable
-`pip install .` of an older rlimit sitting in the virtualenv's
+`pip install .` of an older limivault sitting in the virtualenv's
 site-packages would shadow the working tree and these tests would
 silently check old code.
 
@@ -36,14 +36,14 @@ from pathlib import Path
 
 import pytest
 
-import rlimit
-import rlimit.algorithms
+import limivault
+import limivault.algorithms
 
 _SRC = Path(__file__).resolve().parents[1] / "src"
 
 
 def _subprocess_env() -> dict[str, str]:
-    """Environment that makes a child Python import rlimit from this
+    """Environment that makes a child Python import limivault from this
     checkout's src/ tree, ahead of anything installed in site-packages."""
     env = dict(os.environ)
     existing = env.get("PYTHONPATH")
@@ -53,17 +53,17 @@ def _subprocess_env() -> dict[str, str]:
     return env
 
 
-def test_rlimit_is_imported_from_this_checkout() -> None:
-    assert Path(rlimit.__file__).resolve().is_relative_to(_SRC), (
-        f"rlimit was imported from {rlimit.__file__}, not from {_SRC}. A stale "
+def test_limivault_is_imported_from_this_checkout() -> None:
+    assert Path(limivault.__file__).resolve().is_relative_to(_SRC), (
+        f"limivault was imported from {limivault.__file__}, not from {_SRC}. A stale "
         "non-editable install is probably shadowing the working tree; "
         "run `pip install -e .` in the project root."
     )
 
 
-def test_every_name_in_rlimit_all_resolves() -> None:
-    for name in rlimit.__all__:
-        assert getattr(rlimit, name) is not None, name
+def test_every_name_in_limivault_all_resolves() -> None:
+    for name in limivault.__all__:
+        assert getattr(limivault, name) is not None, name
 
 
 def test_root_exports_supporting_public_api() -> None:
@@ -87,49 +87,49 @@ def test_root_exports_supporting_public_api() -> None:
         "LuaSimulationRecorder",
         "run_lua_simulation",
     }
-    assert expected <= set(rlimit.__all__)
+    assert expected <= set(limivault.__all__)
     for name in expected:
-        assert getattr(rlimit, name) is not None
+        assert getattr(limivault, name) is not None
 
 
 def test_every_name_in_algorithms_all_resolves() -> None:
-    for name in rlimit.algorithms.__all__:
-        assert getattr(rlimit.algorithms, name) is not None, name
+    for name in limivault.algorithms.__all__:
+        assert getattr(limivault.algorithms, name) is not None, name
 
 
 def test_algorithm_classes_are_the_same_object_from_both_packages() -> None:
-    for name in rlimit.algorithms.__all__:
-        assert getattr(rlimit, name) is getattr(rlimit.algorithms, name), name
+    for name in limivault.algorithms.__all__:
+        assert getattr(limivault, name) is getattr(limivault.algorithms, name), name
 
 
 def test_all_has_no_duplicates() -> None:
-    assert len(rlimit.__all__) == len(set(rlimit.__all__))
-    assert len(rlimit.algorithms.__all__) == len(set(rlimit.algorithms.__all__))
+    assert len(limivault.__all__) == len(set(limivault.__all__))
+    assert len(limivault.algorithms.__all__) == len(set(limivault.algorithms.__all__))
 
 
 def test_there_are_24_algorithm_classes() -> None:
     """6 algorithms x {in-memory, Redis Lua/GCRA} x {sync, async}."""
-    assert len(rlimit.algorithms.__all__) == 24
+    assert len(limivault.algorithms.__all__) == 24
 
 
 def test_unknown_attribute_raises_attribute_error() -> None:
     with pytest.raises(AttributeError):
-        rlimit.definitely_not_a_real_name  # noqa: B018
+        limivault.definitely_not_a_real_name  # noqa: B018
     with pytest.raises(AttributeError):
-        rlimit.algorithms.definitely_not_a_real_name  # noqa: B018
+        limivault.algorithms.definitely_not_a_real_name  # noqa: B018
 
 
 def test_dir_lists_lazy_names() -> None:
-    assert "FixedWindow" in dir(rlimit)
-    assert "RedisGcraTokenBucket" in dir(rlimit.algorithms)
+    assert "FixedWindow" in dir(limivault)
+    assert "RedisGcraTokenBucket" in dir(limivault.algorithms)
 
 
-def test_import_rlimit_does_not_import_any_algorithm_module() -> None:
+def test_import_limivault_does_not_import_any_algorithm_module() -> None:
     code = (
-        "import sys, rlimit, rlimit.logging, rlimit.algorithms\n"
+        "import sys, limivault, limivault.logging, limivault.algorithms\n"
         "loaded = sorted(\n"
         "    m for m in sys.modules\n"
-        "    if m.startswith('rlimit.algorithms.')\n"
+        "    if m.startswith('limivault.algorithms.')\n"
         ")\n"
         "assert not loaded, loaded\n"
     )
@@ -143,14 +143,14 @@ def test_import_rlimit_does_not_import_any_algorithm_module() -> None:
 
 
 def test_cli_demo_output_has_no_debug_decision_lines() -> None:
-    """Regression guard for the logging-order trap: `rlimit demo` must
+    """Regression guard for the logging-order trap: `limivault demo` must
     print only its own ALLOWED/DENIED lines, not one structlog DEBUG
     line per allow() call."""
     result = subprocess.run(
         [
             sys.executable,
             "-m",
-            "rlimit",
+            "limivault",
             "demo",
             "--algorithm",
             "fixed_window",

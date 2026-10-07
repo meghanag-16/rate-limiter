@@ -1,4 +1,4 @@
-"""Unit tests for rlimit.algorithms.sliding_window_log.SlidingWindowLog.
+"""Unit tests for limivault.algorithms.sliding_window_log.SlidingWindowLog.
 
 Constructor validation: limit > 0 and period > 0 are now enforced in
 __init__ (raises ValueError). See TestConstructor.
@@ -27,9 +27,9 @@ import pytest
 from hypothesis import given, settings
 from hypothesis import strategies as st
 
-from rlimit.algorithms.sliding_window_log import SlidingWindowLog
-from rlimit.base import UnsatisfiableRequestError
-from rlimit.storage import InMemoryStorage
+from limivault.algorithms.sliding_window_log import SlidingWindowLog
+from limivault.base import UnsatisfiableRequestError
+from limivault.storage import InMemoryStorage
 from tests.mp_workers import hammer_sliding_window_log
 
 

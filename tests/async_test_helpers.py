@@ -14,7 +14,7 @@ from __future__ import annotations
 import asyncio
 from typing import Any, AsyncContextManager
 
-from rlimit.storage import AsyncInMemoryStorage, AsyncStorageBackend
+from limivault.storage import AsyncInMemoryStorage, AsyncStorageBackend
 
 
 class YieldingAsyncStorage(AsyncStorageBackend):

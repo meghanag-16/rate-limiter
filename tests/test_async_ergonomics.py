@@ -1,5 +1,5 @@
 # tests/test_async_ergonomics.py
-"""Tests for rlimit.async_ergonomics (async).
+"""Tests for limivault.async_ergonomics (async).
 
 FakeClock defined locally, per project convention -- see
 test_async_fixed_window.py for why. Mirrors test_ergonomics.py's sync
@@ -16,15 +16,15 @@ import asyncio
 
 import pytest
 
-from rlimit.algorithms.async_fixed_window import AsyncFixedWindow
-from rlimit.async_ergonomics import (
+from limivault.algorithms.async_fixed_window import AsyncFixedWindow
+from limivault.async_ergonomics import (
     AsyncKeyedLimiter,
     RateLimitTimeoutError,
     async_block_until_allowed,
     async_rate_limit,
     async_wait,
 )
-from rlimit.base import UnsatisfiableRequestError
+from limivault.base import UnsatisfiableRequestError
 from tests.async_test_helpers import YieldingAsyncStorage
 
 
