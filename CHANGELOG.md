@@ -1,4 +1,7 @@
 # Changelog
+## 0.1.1 - 2026-10-08
+
+- Fixed README badges and links so they display correctly on PyPI.
 
 ## 0.1.0 - 2026-10-07
 
