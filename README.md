@@ -5,7 +5,7 @@ Rate limiting for Python 3.14+, with synchronous and asynchronous APIs, in-memor
 [![CI](https://github.com/meghanag-16/rate-limiter/actions/workflows/ci.yml/badge.svg)](https://github.com/meghanag-16/rate-limiter/actions/workflows/ci.yml)
 [![PyPI version](https://img.shields.io/pypi/v/limivault)](https://pypi.org/project/limivault/)
 [![Python versions](https://img.shields.io/pypi/pyversions/limivault)](https://pypi.org/project/limivault/)
-[![License](https://github.com/meghanag-16/rate-limiter/blob/main/LICENSE)](LICENSE)
+[![License](https://img.shields.io/pypi/l/limivault)](https://github.com/meghanag-16/rate-limiter/blob/main/LICENSE)
 
 [Changelog](https://github.com/meghanag-16/rate-limiter/blob/main/CHANGELOG.md)
 
