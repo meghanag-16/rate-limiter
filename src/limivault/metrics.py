@@ -254,6 +254,11 @@ class BackendErrorEvent:
     cost: int
     error: BaseException
     timestamp: float = 0.0
+    # 0.1.2: "busy" when the redis-py connection pool was exhausted (the
+    # server may be healthy -- see limivault.exceptions.BackendBusyError),
+    # "unavailable" for every other backend failure. Defaults keep
+    # hand-built events working.
+    kind: str = "unavailable"
 
 
 @runtime_checkable

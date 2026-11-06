@@ -361,7 +361,10 @@ def _assert_limiter_uses_this_clock(limiter: Any, clock: SimulationClock) -> Non
     `_clock` attribute, the same pattern already used in
     tests/test_leaky_bucket.py's `test_accepts_injected_clock_and_storage`.
     """
-    if limiter._clock is not clock:
+    # Limiters wrap their clock in a NonDecreasingClock (0.1.2); compare
+    # against the clock the caller actually passed in.
+    own_clock = getattr(limiter._clock, "wrapped", limiter._clock)
+    if own_clock is not clock:
         raise ValueError(
             "limiter was not constructed with clock=<this SimulationClock "
             "instance>. run_simulation()/async_run_simulation() require the "

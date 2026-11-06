@@ -87,7 +87,7 @@ class TestMeterConstructor:
         import time
 
         limiter = LeakyBucketMeter(capacity=5, leak_rate=1)
-        assert limiter._clock is time.monotonic
+        assert limiter._clock.wrapped is time.monotonic  # 0.1.2 wrapper
 
     def test_accepts_injected_clock_and_storage(self, fake_clock: FakeClock) -> None:
         storage = InMemoryStorage()
@@ -95,7 +95,7 @@ class TestMeterConstructor:
             capacity=5, leak_rate=1, storage=storage, clock=fake_clock
         )
         assert limiter._storage is storage
-        assert limiter._clock is fake_clock
+        assert limiter._clock.wrapped is fake_clock  # 0.1.2 wrapper
 
     def test_negative_capacity_raises(self) -> None:
         with pytest.raises(ValueError):
@@ -285,7 +285,7 @@ class TestQueueConstructor:
         import time
 
         limiter = LeakyBucketQueue(capacity=5, leak_rate=1)
-        assert limiter._clock is time.monotonic
+        assert limiter._clock.wrapped is time.monotonic  # 0.1.2 wrapper
 
     def test_accepts_injected_clock_and_storage(self, fake_clock: FakeClock) -> None:
         storage = InMemoryStorage()
@@ -293,7 +293,7 @@ class TestQueueConstructor:
             capacity=5, leak_rate=1, storage=storage, clock=fake_clock
         )
         assert limiter._storage is storage
-        assert limiter._clock is fake_clock
+        assert limiter._clock.wrapped is fake_clock  # 0.1.2 wrapper
 
     def test_negative_capacity_raises(self) -> None:
         with pytest.raises(ValueError):

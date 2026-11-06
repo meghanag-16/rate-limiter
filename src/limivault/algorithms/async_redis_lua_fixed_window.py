@@ -21,7 +21,7 @@ from limivault.algorithms._redis_lua_base import (
     validate_ttl_seconds,
 )
 from limivault.base import AsyncRateLimiter, UnsatisfiableRequestError
-from limivault.exceptions import BackendUnavailableError
+from limivault.exceptions import backend_error
 from limivault.logging import get_logger
 from limivault.metrics import MetricsHook, default_metrics_hook
 from limivault.redis_lua_scripts import (
@@ -103,7 +103,8 @@ class AsyncRedisLuaFixedWindow(AsyncRateLimiter):
                 error=exc,
                 timestamp=error_ts,
             )
-            raise BackendUnavailableError(
+            raise backend_error(
+                exc,
                 f"Redis backend unavailable while running script for key {key!r}"
             ) from exc
         allowed = bool(int(result[0]))
@@ -150,7 +151,8 @@ class AsyncRedisLuaFixedWindow(AsyncRateLimiter):
             raw = await self._client.hmget(self._data_key(key), "window_start", "count")
             now = await _server_time(self._client)
         except _CATCHABLE_BACKEND_ERRORS as exc:
-            raise BackendUnavailableError(
+            raise backend_error(
+                exc,
                 f"Redis backend unavailable while reading key {key!r}"
             ) from exc
         window_start = self._window_start(now)
@@ -170,7 +172,8 @@ class AsyncRedisLuaFixedWindow(AsyncRateLimiter):
                 args=[0, "1", self._limit, self._period, self._ttl_seconds],
             )
         except _CATCHABLE_BACKEND_ERRORS as exc:
-            raise BackendUnavailableError(
+            raise backend_error(
+                exc,
                 f"Redis backend unavailable while reading key {key!r}"
             ) from exc
         return int(result[2])

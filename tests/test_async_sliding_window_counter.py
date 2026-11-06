@@ -59,7 +59,7 @@ def test_accepts_injected_clock_and_storage() -> None:
         limit=5, period=10.0, storage=storage, clock=clock
     )
     assert limiter._storage is storage
-    assert limiter._clock is clock
+    assert limiter._clock.wrapped is clock  # 0.1.2 wrapper
 
 
 def test_zero_limit_rejected() -> None:
