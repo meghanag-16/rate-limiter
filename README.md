@@ -24,11 +24,34 @@ Redis example (requires a reachable Redis server):
 
 ```python
 import redis
-from limivault import RedisGcraTokenBucket
+from limivault import BackendBusyError, BackendUnavailableError, RedisGcraTokenBucket
 
-client = redis.Redis.from_url("redis://localhost:6379")
+# A blocking pool makes callers wait briefly for a free connection
+# instead of failing instantly when a burst uses them all.
+pool = redis.BlockingConnectionPool.from_url(
+    "redis://localhost:6379", max_connections=20, timeout=2
+)
+client = redis.Redis(connection_pool=pool)
 limiter = RedisGcraTokenBucket(client, capacity=100, refill_rate=10)
-allowed = limiter.allow("user-123")
+
+try:
+    allowed = limiter.allow("user-123")
+except BackendBusyError:
+    allowed = False    # pool exhausted: Redis may be fine, never fail open here
+except BackendUnavailableError:
+    allowed = True     # Redis outage: your choice (fail open shown here)
+```
+
+Unlike the in-memory limiters, Redis limiters **raise** from `allow()` when Redis cannot answer. `BackendBusyError` is a subclass of `BackendUnavailableError`, so code that only catches the parent keeps working. The async classes work the same way with `redis.asyncio.BlockingConnectionPool`.
+
+Bounding in-memory state on a public API (one entry per distinct key otherwise):
+
+```python
+from limivault import AsyncTokenBucket
+from limivault.storage import AsyncInMemoryStorage
+
+storage = AsyncInMemoryStorage(max_keys=50_000, state_idle_seconds=600)
+limiter = AsyncTokenBucket(capacity=10, refill_rate=1, storage=storage)
 ```
 
 ## Logging
@@ -120,16 +143,21 @@ GitHub Actions (`.github/workflows/ci.yml`) runs lint/type/security checks, the 
 These are deliberate scope decisions or documented tradeoffs, not hidden bugs.
 
 **Backends and deployment**
-- In-memory limiters keep state inside one process. Two processes each get their own independent limit. `InMemoryStorage` has an opt-in `multiprocess_safe=True` mode (backed by a `multiprocessing.Manager`) for sharing state between processes on one machine; it is slower than the default. For sharing limits across machines, use the Redis limiters.
+- In-memory limiters keep state inside one process. Two processes each get their own independent limit. Since 0.1.2 a `MultiProcessStateWarning` is emitted once per process when the in-memory storage looks like it runs in one of several workers (started by `multiprocessing`, e.g. `uvicorn --workers`/`--reload`, or `WEB_CONCURRENCY` > 1). It is a heuristic: it cannot see other containers. Silence it with `LIMIVAULT_SILENCE_MULTIPROCESS_WARNING=1`. `InMemoryStorage` has an opt-in `multiprocess_safe=True` mode (backed by a `multiprocessing.Manager`) for sharing state between processes on one machine; it is slower than the default. For sharing limits across machines, use the Redis limiters.
 - The Redis backend is the Lua/GCRA family only. Each limiter key maps to one Redis key (prefix `limivault:lua:` by default), and decisions use Redis server time, so client clocks do not matter.
 - It has been tested against a single Redis 7 server (`redis:7-alpine` in the test suite). Redis Cluster, Sentinel and other Redis versions have not been tested.
 - When Redis is unreachable, Redis limiters raise `BackendUnavailableError`. The library does not choose between fail-open and fail-closed for you; catch the exception and decide.
+- When the redis-py **connection pool** is exhausted (Redis itself may be healthy), they raise `BackendBusyError`, a subclass, and the metrics event has `kind="busy"`. redis-py's default async pool allows 100 connections and errors instantly beyond that, so an app that fails open on every `BackendUnavailableError` would admit a large burst with no limit check. Treat `BackendBusyError` as throttled and use a `BlockingConnectionPool`.
 - Each Redis decision costs a network round trip, so it is much slower than the in-memory path (see Benchmarks). The sliding window log does work proportional to the number of entries in its window, so its cost grows with traffic on a single key, in memory and in Redis.
 - The Redis tests need Docker with Linux containers. There is no fallback for machines without Docker.
 
 **In-memory storage**
 - Per-key locks are created lazily and removed by an opportunistic idle sweep (every 1000 lock lookups, for locks idle at least 300 seconds by default; both are constructor arguments). Memory is proportional to recent key count rather than all-time key count, but there is no hard cap between sweeps.
+- Stored state is kept per key forever by default. Since 0.1.2 `InMemoryStorage` / `AsyncInMemoryStorage` accept `max_keys` (soft LRU cap; evicting a key resets that key's limit, so size it above your active client count) and `state_idle_seconds` (drop state idle that long; safe when at least the limiter's full-recovery time). `len(storage)` and `storage.evicted_count` report usage. Not available with `multiprocess_safe=True`.
 - A narrow race between the sweep and a caller about to acquire a lock is documented and accepted in the `limivault/storage.py` docstring.
+
+**Clocks**
+- The injected `clock` should be monotonic (the default `time.monotonic` is). Since 0.1.2 every in-memory limiter wraps it so time never moves backwards: a backwards jump freezes the limiter until the clock catches up, instead of granting a fresh quota (fixed window and sliding window counter used to over-admit by up to 100%).
 
 **API behavior**
 - `allow_wait()` only reports how long to wait. It does not reserve capacity, so another caller can take it first. `block_until_allowed` and `async_block_until_allowed` retry in a loop for this reason.

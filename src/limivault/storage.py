@@ -238,10 +238,13 @@ from __future__ import annotations
 import asyncio
 import multiprocessing
 import multiprocessing.managers
+import os
 import threading
 import time
+import warnings
 import zlib
 from abc import ABC, abstractmethod
+from collections import OrderedDict
 from contextlib import AbstractContextManager
 from typing import Any, AsyncContextManager, Callable, MutableMapping
 
@@ -276,6 +279,64 @@ _DEFAULT_LOCK_SWEEP_INTERVAL = 1000
 _DEFAULT_LOCK_IDLE_SECONDS = 300.0
 
 
+_SILENCE_ENV = "LIMIVAULT_SILENCE_MULTIPROCESS_WARNING"
+_multiprocess_warning_emitted = False
+
+
+def _multiprocess_reason() -> str | None:
+    """Why this process looks like one of several workers, or None."""
+    if multiprocessing.parent_process() is not None:
+        return (
+            "this process was started by multiprocessing (for example "
+            "uvicorn --workers or --reload)"
+        )
+    raw = os.environ.get("WEB_CONCURRENCY", "")
+    try:
+        workers = int(raw) if raw else 1
+    except ValueError:
+        workers = 1
+    if workers > 1:
+        return f"WEB_CONCURRENCY={workers}"
+    return None
+
+
+def _warn_if_multi_process() -> None:
+    """Fix for "in-memory limits multiply with workers": warn once per
+    process. See limivault.exceptions.MultiProcessStateWarning."""
+    global _multiprocess_warning_emitted
+    if _multiprocess_warning_emitted or os.environ.get(_SILENCE_ENV) == "1":
+        return
+    reason = _multiprocess_reason()
+    if reason is None:
+        return
+    _multiprocess_warning_emitted = True
+    from limivault.exceptions import MultiProcessStateWarning
+
+    warnings.warn(
+        "limivault in-memory storage keeps limits inside this one process, "
+        f"and {reason}. If more than one process serves traffic, each "
+        "enforces its own separate limit (N workers => up to N x the limit). "
+        "Use the Redis limiters to share one limit, or set "
+        f"{_SILENCE_ENV}=1 if this process really is the only one.",
+        MultiProcessStateWarning,
+        stacklevel=4,
+    )
+
+
+def _validate_bounds(max_keys: int | None, state_idle_seconds: float | None) -> None:
+    if max_keys is not None and (
+        not isinstance(max_keys, int) or isinstance(max_keys, bool) or max_keys <= 0
+    ):
+        raise ValueError(f"max_keys must be a positive int, got {max_keys!r}")
+    if state_idle_seconds is not None and not (
+        state_idle_seconds > 0 and state_idle_seconds != float("inf")
+    ):
+        raise ValueError(
+            "state_idle_seconds must be positive and finite, "
+            f"got {state_idle_seconds!r}"
+        )
+
+
 def _stable_key_hash(key: str) -> int:
     """Deterministic hash of `key`, stable across processes and Python
     invocations (unlike the built-in `hash()`, which is salted with a
@@ -293,6 +354,26 @@ class InMemoryStorage(StorageBackend):
     Scope: safe to share across threads within one process. NOT safe
     to share across processes unless constructed with
     multiprocess_safe=True.
+
+    BOUNDED STATE (0.1.2, opt-in, default mode only):
+    By default one state entry is kept per key ever seen, forever --
+    memory grows with the number of distinct keys (e.g. a flood of new
+    IPs on a public API). Two optional limits bound it:
+
+    - max_keys: soft cap on stored keys. Setting a NEW key beyond the
+      cap evicts the least-recently-used key. Evicting a key RESETS its
+      limit (that client starts fresh), so pick a cap comfortably above
+      your number of concurrently active clients. "Soft": a decision
+      already in flight for an evicted key re-inserts it.
+    - state_idle_seconds: drop state not read or written for this long,
+      on the same opportunistic sweep as the lock cleanup. Safe when set
+      to at least the limiter's full-recovery time (period for window
+      algorithms, capacity / rate for buckets): by then a fresh state is
+      equivalent to the dropped one.
+
+    `len(storage)` is the current key count and `storage.evicted_count`
+    counts evictions by either rule. Neither option is supported with
+    multiprocess_safe=True.
     """
 
     def __init__(
@@ -302,6 +383,8 @@ class InMemoryStorage(StorageBackend):
         lock_sweep_interval: int = _DEFAULT_LOCK_SWEEP_INTERVAL,
         lock_idle_seconds: float = _DEFAULT_LOCK_IDLE_SECONDS,
         clock: Callable[[], float] = time.monotonic,
+        max_keys: int | None = None,
+        state_idle_seconds: float | None = None,
     ) -> None:
         if lock_sweep_interval <= 0:
             raise ValueError(
@@ -311,9 +394,24 @@ class InMemoryStorage(StorageBackend):
             raise ValueError(
                 f"lock_idle_seconds must be positive, got {lock_idle_seconds}"
             )
+        _validate_bounds(max_keys, state_idle_seconds)
+        bounded = max_keys is not None or state_idle_seconds is not None
+        if multiprocess_safe and bounded:
+            raise ValueError(
+                "max_keys / state_idle_seconds are not supported with "
+                "multiprocess_safe=True"
+            )
         self._lock_sweep_interval = lock_sweep_interval
         self._lock_idle_seconds = lock_idle_seconds
         self._clock = clock
+        # 0.1.2 bounded-state options (see BOUNDED STATE in the class
+        # docstring). Both None = the original unbounded plain-dict path.
+        self._max_keys = max_keys
+        self._state_idle_seconds = state_idle_seconds
+        self._bounded = bounded
+        self._state_last_used: dict[str, float] = {}
+        self._data_guard = threading.Lock()
+        self.evicted_count = 0
 
         self._multiprocess_safe = multiprocess_safe
         if multiprocess_safe:
@@ -341,22 +439,25 @@ class InMemoryStorage(StorageBackend):
         else:
             self._mp_lock_pool_size = 0
             self._manager = None
-            self._data = {}
+            self._data = OrderedDict() if self._bounded else {}
             self._lock_pool = []
             self._locks = {}
             self._locks_guard = threading.Lock()
             self._lock_last_used = {}
             self._sweep_call_count = 0
+            _warn_if_multi_process()
 
     def __getstate__(self) -> dict[str, Any]:
         # See module docstring point 3: the Manager itself can't be
         # (and doesn't need to be) pickled across a process boundary.
         state = self.__dict__.copy()
         state["_manager"] = None
+        state["_data_guard"] = None  # thread locks can't be pickled
         return state
 
     def __setstate__(self, state: dict[str, Any]) -> None:
         self.__dict__.update(state)
+        self._data_guard = threading.Lock()
 
     def _sweep_idle_locks_locked(self, now: float) -> None:
         """Evict idle, currently-unlocked entries from `_locks`.
@@ -382,6 +483,27 @@ class InMemoryStorage(StorageBackend):
                 self._lock_last_used.pop(key, None)
             finally:
                 lock.release()
+        if self._state_idle_seconds is not None:
+            self._sweep_idle_state(now)
+
+    def _sweep_idle_state(self, now: float) -> None:
+        """Drop stored state for keys unused for `state_idle_seconds`.
+        Runs on the same opportunistic schedule as the lock sweep.
+        `_data` is kept in least-recently-used order, so the scan stops
+        at the first key that is still fresh. A key whose lock is held
+        right now is skipped, never dropped."""
+        idle = self._state_idle_seconds
+        assert idle is not None and self._locks is not None  # nosec B101
+        with self._data_guard:
+            for key in list(self._data.keys()):
+                if now - self._state_last_used.get(key, now) < idle:
+                    break
+                lock = self._locks.get(key)
+                if lock is not None and lock.locked():
+                    continue
+                del self._data[key]
+                self._state_last_used.pop(key, None)
+                self.evicted_count += 1
 
     def _get_lock(self, key: str) -> AbstractContextManager[bool]:
         if self._multiprocess_safe:
@@ -401,10 +523,40 @@ class InMemoryStorage(StorageBackend):
             return self._locks[key]
 
     def get(self, key: str) -> dict[str, Any] | None:
-        return self._data.get(key)
+        if not self._bounded:
+            return self._data.get(key)
+        with self._data_guard:
+            state = self._data.get(key)
+            if state is not None:
+                self._touch_locked(key)
+            return state
 
     def set(self, key: str, state: dict[str, Any]) -> None:
-        self._data[key] = state
+        if not self._bounded:
+            self._data[key] = state
+            return
+        with self._data_guard:
+            self._data[key] = state
+            self._touch_locked(key)
+            self._evict_over_cap_locked()
+
+    def _touch_locked(self, key: str) -> None:
+        assert isinstance(self._data, OrderedDict)  # nosec B101
+        self._data.move_to_end(key)
+        self._state_last_used[key] = self._clock()
+
+    def _evict_over_cap_locked(self) -> None:
+        if self._max_keys is None:
+            return
+        assert isinstance(self._data, OrderedDict)  # nosec B101
+        while len(self._data) > self._max_keys:
+            oldest, _ = self._data.popitem(last=False)
+            self._state_last_used.pop(oldest, None)
+            self.evicted_count += 1
+
+    def __len__(self) -> int:
+        """Number of keys that currently have stored state."""
+        return len(self._data)
 
     def lock(self, key: str) -> AbstractContextManager[bool]:
         return self._get_lock(key)
@@ -517,6 +669,8 @@ class AsyncInMemoryStorage(AsyncStorageBackend):
         lock_sweep_interval: int = _DEFAULT_LOCK_SWEEP_INTERVAL,
         lock_idle_seconds: float = _DEFAULT_LOCK_IDLE_SECONDS,
         clock: Callable[[], float] = time.monotonic,
+        max_keys: int | None = None,
+        state_idle_seconds: float | None = None,
     ) -> None:
         if lock_sweep_interval <= 0:
             raise ValueError(
@@ -526,7 +680,15 @@ class AsyncInMemoryStorage(AsyncStorageBackend):
             raise ValueError(
                 f"lock_idle_seconds must be positive, got {lock_idle_seconds}"
             )
-        self._data: dict[str, dict[str, Any]] = {}
+        _validate_bounds(max_keys, state_idle_seconds)
+        self._max_keys = max_keys
+        self._state_idle_seconds = state_idle_seconds
+        self._bounded = max_keys is not None or state_idle_seconds is not None
+        self._data: dict[str, dict[str, Any]] = (
+            OrderedDict() if self._bounded else {}
+        )
+        self._state_last_used: dict[str, float] = {}
+        self.evicted_count = 0
         self._locks: dict[str, asyncio.Lock] = {}
         self._locks_guard = asyncio.Lock()
         self._lock_last_used: dict[str, float] = {}
@@ -534,6 +696,7 @@ class AsyncInMemoryStorage(AsyncStorageBackend):
         self._lock_sweep_interval = lock_sweep_interval
         self._lock_idle_seconds = lock_idle_seconds
         self._clock = clock
+        _warn_if_multi_process()
 
     def _sweep_idle_locks_locked(self, now: float) -> None:
         """Evict idle, currently-unlocked entries from `_locks`.
@@ -549,12 +712,49 @@ class AsyncInMemoryStorage(AsyncStorageBackend):
                 continue
             del self._locks[key]
             self._lock_last_used.pop(key, None)
+        if self._state_idle_seconds is not None:
+            self._sweep_idle_state(now)
+
+    def _sweep_idle_state(self, now: float) -> None:
+        """Async mirror of InMemoryStorage._sweep_idle_state. No extra
+        guard is needed: this runs without awaiting, on one event loop."""
+        assert self._state_idle_seconds is not None  # nosec B101
+        for key in list(self._data.keys()):
+            if now - self._state_last_used.get(key, now) < self._state_idle_seconds:
+                break
+            lock = self._locks.get(key)
+            if lock is not None and lock.locked():
+                continue
+            del self._data[key]
+            self._state_last_used.pop(key, None)
+            self.evicted_count += 1
 
     async def get(self, key: str) -> dict[str, Any] | None:
-        return self._data.get(key)
+        state = self._data.get(key)
+        if state is not None and self._bounded:
+            self._touch(key)
+        return state
 
     async def set(self, key: str, state: dict[str, Any]) -> None:
         self._data[key] = state
+        if not self._bounded:
+            return
+        self._touch(key)
+        if self._max_keys is not None:
+            while len(self._data) > self._max_keys:
+                oldest = next(iter(self._data))
+                del self._data[oldest]
+                self._state_last_used.pop(oldest, None)
+                self.evicted_count += 1
+
+    def _touch(self, key: str) -> None:
+        assert isinstance(self._data, OrderedDict)  # nosec B101
+        self._data.move_to_end(key)
+        self._state_last_used[key] = self._clock()
+
+    def __len__(self) -> int:
+        """Number of keys that currently have stored state."""
+        return len(self._data)
 
     def lock(self, key: str) -> AsyncContextManager[bool]:
         return _AsyncKeyLock(self, key)

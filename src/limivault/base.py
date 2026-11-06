@@ -26,14 +26,22 @@ cost type:
       "invalid cost" under allow()/allow_wait() below. There is no
       separate "TypeError" channel -- wrong type and invalid value
       (negative) share the same failure mode per method, to keep the
-      two failure surfaces (allow() never raises; allow_wait() raises
+      two failure surfaces (allow() never raises for bad input; allow_wait() raises
       for invalid input) each internally consistent rather than having
       wrong-type sometimes raise something allow() doesn't otherwise
       raise.
 
 allow(key, cost=1):
-    - Never raises. If `cost` exceeds the limiter's maximum possible
-      capacity, returns False rather than raising.
+    - Never raises for bad INPUT. If `cost` exceeds the limiter's
+      maximum possible capacity, returns False rather than raising.
+    - DOES raise for backend failures: limiters backed by Redis (and
+      any custom storage backend that raises it) raise
+      BackendUnavailableError when the backend cannot answer, and its
+      subclass BackendBusyError when the redis-py connection pool is
+      exhausted (see limivault.exceptions). The library never turns an
+      outage into True or False for you -- callers of Redis limiters
+      must catch it and choose fail-open or fail-closed explicitly. The
+      default in-memory storage never raises it.
     - `cost` that is not a valid int (wrong type, or a valid int that
       is negative) is denied: returns False without touching stored
       state at all -- not even to read it.
@@ -59,7 +67,7 @@ allow_wait(key, cost=1):
       maximum possible capacity -- no amount of waiting would help.
     - Raises ValueError if `cost` is not a valid int (wrong type, or a
       valid int that is negative). This is a deliberate asymmetry with
-      allow(): allow() never raises by contract, so invalid cost is
+      allow(): allow() never raises for bad input by contract, so invalid cost is
       silently denied there, but allow_wait() already raises for the
       "can never be satisfied" case, so raising ValueError for
       "invalid input" too keeps both failure modes in the same channel
@@ -164,9 +172,9 @@ class RateLimiter(ABC):
 
         Returns True if allowed (quota consumed), False if denied
         (quota unaffected, including for an invalid `cost`). Never
-        raises. See module docstring for the full cost-handling
-        contract (type validation, zero cost, negative cost,
-        over-capacity cost).
+        raises for bad input; raises BackendUnavailableError (or its
+        subclass BackendBusyError) when a storage backend such as Redis
+        cannot answer. See module docstring for the full contract.
         """
         ...
 
@@ -241,8 +249,9 @@ class AsyncRateLimiter(ABC):
 
         Returns True if allowed (quota consumed), False if denied
         (quota unaffected, including for an invalid `cost`). Never
-        raises. See base.py's module docstring for the full
-        cost-handling contract.
+        raises for bad input; raises BackendUnavailableError (or its
+        subclass BackendBusyError) when a storage backend such as Redis
+        cannot answer. See base.py's module docstring for the contract.
         """
         ...
 

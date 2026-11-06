@@ -114,7 +114,11 @@ if TYPE_CHECKING:
     from limivault.ergonomics import (
         wait as wait,
     )
+    from limivault.exceptions import BackendBusyError as BackendBusyError
     from limivault.exceptions import BackendUnavailableError as BackendUnavailableError
+    from limivault.exceptions import (
+        MultiProcessStateWarning as MultiProcessStateWarning,
+    )
     from limivault.metrics import (
         AllowedEvent as AllowedEvent,
     )
@@ -171,6 +175,8 @@ _EXPORTS: dict[str, str] = {
     "AsyncRateLimiter": "base",
     "UnsatisfiableRequestError": "base",
     "BackendUnavailableError": "exceptions",
+    "BackendBusyError": "exceptions",
+    "MultiProcessStateWarning": "exceptions",
     "AllowedEvent": "metrics",
     "DeniedEvent": "metrics",
     "BackendErrorEvent": "metrics",

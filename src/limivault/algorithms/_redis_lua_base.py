@@ -44,6 +44,7 @@ from __future__ import annotations
 import math
 from typing import Any, Mapping
 
+from limivault.exceptions import is_pool_exhausted
 from limivault.metrics import (
     AllowedEvent,
     BackendErrorEvent,
@@ -137,6 +138,7 @@ def emit_error(
             cost=cost,
             error=error,
             timestamp=timestamp,
+            kind="busy" if is_pool_exhausted(error) else "unavailable",
         ),
     )
 

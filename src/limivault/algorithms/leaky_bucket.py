@@ -22,6 +22,7 @@ import math
 import time
 from typing import Callable
 
+from limivault._clock import non_decreasing
 from limivault.base import RateLimiter, UnsatisfiableRequestError
 from limivault.exceptions import BackendUnavailableError
 from limivault.logging import get_logger
@@ -71,7 +72,8 @@ class LeakyBucketMeter(RateLimiter):
         self._capacity = capacity
         self._leak_rate = leak_rate
         self._storage = storage if storage is not None else InMemoryStorage()
-        self._clock = clock
+        # 0.1.2: never let time go backwards (see limivault._clock).
+        self._clock = non_decreasing(clock)
         self._metrics = metrics if metrics is not None else default_metrics_hook()
 
     def _get_state(self, key: str, now: float) -> tuple[float, float]:
@@ -241,7 +243,8 @@ class LeakyBucketQueue(RateLimiter):
         self._capacity = capacity
         self._leak_rate = leak_rate
         self._storage = storage if storage is not None else InMemoryStorage()
-        self._clock = clock
+        # 0.1.2: never let time go backwards (see limivault._clock).
+        self._clock = non_decreasing(clock)
         self._metrics = metrics if metrics is not None else default_metrics_hook()
 
     def _get_state(self, key: str, now: float) -> tuple[int, float]:
